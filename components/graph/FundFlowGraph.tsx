@@ -9,7 +9,7 @@ import { shortenAddress } from "@/lib/utils";
 
 const COLORS = {
   victim: "#f5f5f5",
-  wallet: "#888888",
+  wallet: "#9a9a9a",
   mixer: "#ff9500",
   exchange: "#ff3b3b",
 };
@@ -25,7 +25,7 @@ function Node({
   label,
   sublabel,
   appear,
-  pulse,
+  highlight,
   onClick,
 }: {
   position: [number, number, number];
@@ -34,57 +34,77 @@ function Node({
   label: string;
   sublabel?: string;
   appear?: boolean;
-  pulse?: boolean;
+  highlight?: boolean;
   onClick?: () => void;
 }) {
   const scale = useRef(0);
   const mesh = useRef<THREE.Mesh>(null);
+  const ring = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
   useFrame((_, delta) => {
     if (appear) {
-      scale.current = Math.min(1, scale.current + delta * 2.2);
-      if (mesh.current) {
-        mesh.current.scale.setScalar(scale.current);
-        const m = (mesh.current.material as THREE.MeshStandardMaterial);
-        m.opacity = scale.current;
-      }
+      scale.current = Math.min(1, scale.current + delta * 2.4);
+    } else {
+      scale.current = 1;
     }
-    if (pulse && mesh.current) {
-      const s = 1 + Math.sin(Date.now() * 0.004) * 0.12;
-      mesh.current.scale.setScalar(scale.current * s);
+    const hoverBoost = hovered ? 1.15 : 1;
+    if (mesh.current) {
+      mesh.current.scale.setScalar(scale.current * hoverBoost);
+      const m = mesh.current.material as THREE.MeshStandardMaterial;
+      m.opacity = scale.current;
+    }
+    if (ring.current) {
+      ring.current.scale.setScalar(scale.current);
+      ring.current.rotation.z += delta * 0.5;
+      (ring.current.material as THREE.MeshBasicMaterial).opacity =
+        scale.current * (highlight ? 0.85 : 0.35);
     }
   });
 
   return (
     <group position={position} onClick={onClick}>
-      <mesh ref={mesh} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)}>
-        <sphereGeometry args={[radius, 24, 24]} />
+      <mesh
+        ref={mesh}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <icosahedronGeometry args={[radius, 0]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={hovered ? 1.4 : pulse ? 1.1 : 0.55}
+          emissiveIntensity={hovered ? 0.9 : highlight ? 0.7 : 0.25}
           transparent
           opacity={appear ? 0 : 1}
-          roughness={0.3}
-          metalness={0.6}
+          roughness={0.55}
+          metalness={0.15}
+          flatShading
         />
       </mesh>
+      {(highlight || hovered) && (
+        <mesh ref={ring} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[radius + 0.35, 0.015, 8, 48]} />
+          <meshBasicMaterial color={color} transparent opacity={0.5} />
+        </mesh>
+      )}
       <Html
         center
-        distanceFactor={14}
-        position={[0, radius + 1.1, 0]}
-        style={{ pointerEvents: "none", opacity: appear ? Math.max(scale.current * 0.9, 0) : 1 }}
+        distanceFactor={15}
+        position={[0, radius + 0.9, 0]}
+        style={{ pointerEvents: "none", opacity: appear ? Math.min(scale.current, 1) : 1 }}
+        zIndexRange={[10, 0]}
       >
         <div
           className="flex flex-col items-center gap-0.5 whitespace-nowrap"
           style={{ fontFamily: "var(--font-mono)" }}
         >
-          <span className="text-[10px] tracking-wider text-text-secondary">{label}</span>
+          <span className="text-[10px] tracking-wider text-text-secondary">
+            {label}
+          </span>
           {sublabel && (
             <span
-              className="text-[9px] px-1.5 py-0.5 rounded font-medium"
-              style={{ color: "#000", background: color }}
+              className="text-[9px] font-semibold uppercase tracking-[0.14em]"
+              style={{ color }}
             >
               {sublabel}
             </span>
@@ -108,51 +128,50 @@ function Edge({
   color: string;
   delay?: number;
 }) {
-  const ref = useRef<any>(null);
-  const progress = useRef(0);
+  const geo = useMemo(() => {
+    const mid: [number, number, number] = [
+      (from[0] + to[0]) / 2,
+      (from[1] + to[1]) / 2 + 2.2,
+      (from[2] + to[2]) / 2,
+    ];
+    const curve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(...from),
+      new THREE.Vector3(...mid),
+      new THREE.Vector3(...to)
+    );
+    return new THREE.TubeGeometry(curve, 48, 0.03, 6, false);
+  }, [from, to]);
+
   const startTime = useRef(0);
+  const progress = useRef(0);
+  const total = geo.index ? geo.index.count : 0;
+
+  useEffect(() => {
+    startTime.current = 0;
+    progress.current = 0;
+    geo.setDrawRange(0, 0);
+    return () => geo.dispose();
+  }, [geo]);
 
   useFrame(({ clock }, delta) => {
-    if (!ref.current) return;
-    if (appear) {
-      if (startTime.current === 0) startTime.current = clock.getElapsedTime();
-      const delayDone = delay ? clock.getElapsedTime() - startTime.current > delay : true;
-      if (delayDone) {
-        progress.current = Math.min(1, progress.current + delta * 1.6);
-        const opacity = progress.current;
-        const line = (ref.current.material as THREE.LineBasicMaterial);
-        line.opacity = opacity * 0.85;
-        // shorten line as it "draws"
-        const geom = ref.current.geometry as THREE.BufferGeometry;
-        const pos = geom.attributes.position as THREE.BufferAttribute;
-        const mid = [
-          from[0] + (to[0] - from[0]) * 0.5,
-          from[1] + (to[1] - from[1]) * 0.5 + 2.5,
-          from[2] + (to[2] - from[2]) * 0.5,
-        ];
-        const end = [
-          from[0] + (to[0] - from[0]) * progress.current,
-          from[1] + (to[1] - from[1]) * progress.current,
-          from[2] + (to[2] - from[2]) * progress.current,
-        ];
-        pos.setXYZ(0, from[0], from[1], from[2]);
-        pos.setXYZ(1, mid[0], mid[1], mid[2]);
-        pos.setXYZ(2, end[0], end[1], end[2]);
-        pos.needsUpdate = true;
-      }
+    if (!appear) {
+      geo.setDrawRange(0, total);
+      return;
     }
+    if (startTime.current === 0) startTime.current = clock.getElapsedTime();
+    const ready = !delay || clock.getElapsedTime() - startTime.current > delay;
+    if (!ready) {
+      geo.setDrawRange(0, 0);
+      return;
+    }
+    progress.current = Math.min(1, progress.current + delta * 1.5);
+    geo.setDrawRange(0, Math.floor(progress.current * total));
   });
 
   return (
-    <line ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[new Float32Array([...from, ...from, ...from]), 3]}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial color={color} transparent opacity={0.15} />
-    </line>
+    <mesh geometry={geo}>
+      <meshBasicMaterial color={color} transparent opacity={0.75} />
+    </mesh>
   );
 }
 
@@ -169,30 +188,35 @@ function FlowParticle({
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const startTime = useRef(0);
-  const mid = [
+  const mid: [number, number, number] = [
     (from[0] + to[0]) / 2,
-    (from[1] + to[1]) / 2 + 2.5,
+    (from[1] + to[1]) / 2 + 2.2,
     (from[2] + to[2]) / 2,
   ];
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
     if (startTime.current === 0) startTime.current = clock.getElapsedTime();
-    const t = (clock.getElapsedTime() - startTime.current - delay) % 2.4;
-    if (t < 0) return;
-    const p = t / 2.4;
-    // quadratic bezier
-    const x = (1 - p) * (1 - p) * from[0] + 2 * (1 - p) * p * mid[0] + p * p * to[0];
-    const y = (1 - p) * (1 - p) * from[1] + 2 * (1 - p) * p * mid[1] + p * p * to[1];
-    const z = (1 - p) * (1 - p) * from[2] + 2 * (1 - p) * p * mid[2] + p * p * to[2];
+    const t = (clock.getElapsedTime() - startTime.current - delay) % 2.2;
+    if (t < 0) {
+      ref.current.visible = false;
+      return;
+    }
+    ref.current.visible = true;
+    const p = t / 2.2;
+    const x =
+      (1 - p) * (1 - p) * from[0] + 2 * (1 - p) * p * mid[0] + p * p * to[0];
+    const y =
+      (1 - p) * (1 - p) * from[1] + 2 * (1 - p) * p * mid[1] + p * p * to[1];
+    const z =
+      (1 - p) * (1 - p) * from[2] + 2 * (1 - p) * p * mid[2] + p * p * to[2];
     ref.current.position.set(x, y, z);
-    (ref.current.material as THREE.MeshStandardMaterial).color.set(color);
   });
 
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.16, 12, 12]} />
-      <meshBasicMaterial color="#ffffff" />
+    <mesh ref={ref} visible={false}>
+      <sphereGeometry args={[0.11, 10, 10]} />
+      <meshBasicMaterial color={color} />
     </mesh>
   );
 }
@@ -208,53 +232,62 @@ function Scene({
 }) {
   const [selected, setSelected] = useState<number | null>(null);
 
-  const { nodes, edges, staged } = useMemo(() => {
+  const { nodes, edges } = useMemo(() => {
     const nodesArr: {
       address: string;
       type: Hop["type"];
       label?: string;
       pos: [number, number, number];
     }[] = [];
-    nodesArr.push({ address: victimAddress, type: "victim", label: "Victim", pos: [0, 0, 6] });
+    nodesArr.push({
+      address: victimAddress,
+      type: "victim",
+      label: "Victim",
+      pos: [-9, 0, 3],
+    });
 
     hops.forEach((h, i) => {
-      const angle = (i / Math.max(hops.length, 1)) * Math.PI * 0.9 - Math.PI * 0.25;
-      const r = 5.5;
+      const t = (i + 1) / (hops.length + 0.5);
       nodesArr.push({
         address: h.to,
         type: h.type,
         label: h.label,
-        pos: [Math.cos(angle) * r, (i % 2 === 0 ? 1.5 : -1.5) + Math.sin(angle) * 1.2, -i * 2.2],
+        pos: [
+          -9 + t * 18,
+          i % 2 === 0 ? 1.4 : -1.4,
+          3 - t * 12,
+        ],
       });
     });
 
     const edgesArr = hops.map((h, i) => ({
-      from: i === 0 ? 0 : i,
+      from: i,
       to: i + 1,
       color: nodeColor(h.type),
-      amount: h.amount,
     }));
 
-    return { nodes: nodesArr, edges: edgesArr, staged: building };
-  }, [hops, victimAddress, building]);
+    return { nodes: nodesArr, edges: edgesArr };
+  }, [hops, victimAddress]);
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={40} color="#ffffff" />
-      <pointLight position={[-10, -5, -6]} intensity={20} color="#888888" />
-      <gridHelper args={[40, 40, "#1e1e1e", "#141414"]} position={[0, -5.5, -4]} />
+      <fog attach="fog" args={["#000000", 16, 42]} />
+      <hemisphereLight args={["#ffffff", "#1a1a1a", 0.7]} />
+      <directionalLight position={[6, 12, 8]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-8, -4, -6]} intensity={0.4} color="#888888" />
 
       {nodes.map((n, i) => (
         <Node
           key={n.address}
           position={n.pos}
           color={COLORS[n.type]}
-          radius={n.type === "exchange" ? 0.7 : n.type === "victim" ? 0.65 : 0.45}
+          radius={n.type === "exchange" ? 0.72 : n.type === "victim" ? 0.66 : 0.44}
           label={shortenAddress(n.address)}
-          sublabel={n.label ?? (n.type === "victim" ? "Victim Reported" : n.type.toUpperCase())}
-          appear={staged}
-          pulse={n.type === "exchange" || (selected === i && (n.type as string) !== "exchange")}
+          sublabel={
+            n.label ?? (n.type === "victim" ? "Victim Reported" : n.type.toUpperCase())
+          }
+          appear={building}
+          highlight={n.type === "exchange" || n.type === "victim"}
           onClick={() => setSelected(i)}
         />
       ))}
@@ -265,8 +298,8 @@ function Scene({
           from={nodes[e.from].pos}
           to={nodes[e.to].pos}
           color={e.color}
-          appear={staged}
-          delay={i * 0.35}
+          appear={building}
+          delay={i * 0.3}
         />
       ))}
 
@@ -276,17 +309,21 @@ function Scene({
           from={nodes[e.from].pos}
           to={nodes[e.to].pos}
           color={e.color}
-          delay={i * 0.35}
+          delay={i * 0.5}
         />
       ))}
 
       <OrbitControls
         enablePan={false}
-        autoRotate={false}
+        autoRotate
+        autoRotateSpeed={0.45}
         enableDamping
-        minDistance={6}
-        maxDistance={26}
-        target={[0, 0, -2]}
+        dampingFactor={0.08}
+        minDistance={7}
+        maxDistance={30}
+        minPolarAngle={Math.PI / 3.4}
+        maxPolarAngle={Math.PI / 1.9}
+        target={[0, 0, -1]}
       />
     </>
   );
@@ -309,7 +346,7 @@ export default function FundFlowGraph({
   return (
     <Canvas
       dpr={[1, 2]}
-      camera={{ position: [0, 4, 16], fov: 50 }}
+      camera={{ position: [0, 5, 17], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
       className="h-full w-full"
     >
