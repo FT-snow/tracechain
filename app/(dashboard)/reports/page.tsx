@@ -29,7 +29,12 @@ export default function ReportsPage() {
     try {
       const traceRes = await fetch("/api/trace", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY
+            ? { "x-api-key": process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY }
+            : {}),
+        },
         body: JSON.stringify({ address }),
       });
       const trace: TraceResult = await traceRes.json();
@@ -40,7 +45,12 @@ export default function ReportsPage() {
 
       const reportRes = await fetch("/api/report", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY
+            ? { "x-api-key": process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY }
+            : {}),
+        },
         body: JSON.stringify(trace),
       });
       const report = await reportRes.json();

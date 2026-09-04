@@ -25,7 +25,12 @@ export default function TracePage() {
     try {
       const res = await fetch("/api/trace", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY
+            ? { "x-api-key": process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY }
+            : {}),
+        },
         body: JSON.stringify({ address: targetAddr }),
       });
       const data = await res.json();
