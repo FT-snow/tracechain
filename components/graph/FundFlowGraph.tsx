@@ -8,8 +8,8 @@ import { Hop } from "@/lib/data";
 import { shortenAddress } from "@/lib/utils";
 
 const COLORS = {
-  victim: "#a855f7",
-  wallet: "#3b82f6",
+  victim: "#f5f5f5",
+  wallet: "#888888",
   mixer: "#ff9500",
   exchange: "#ff3b3b",
 };
@@ -108,7 +108,7 @@ function Edge({
   color: string;
   delay?: number;
 }) {
-  const ref = useRef<THREE.Line>(null);
+  const ref = useRef<any>(null);
   const progress = useRef(0);
   const startTime = useRef(0);
 
@@ -241,8 +241,8 @@ function Scene({
   return (
     <>
       <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={40} color="#8b5cf6" />
-      <pointLight position={[-10, -5, -6]} intensity={20} color="#3b82f6" />
+      <pointLight position={[10, 10, 10]} intensity={40} color="#ffffff" />
+      <pointLight position={[-10, -5, -6]} intensity={20} color="#888888" />
       <gridHelper args={[40, 40, "#1e1e1e", "#141414"]} position={[0, -5.5, -4]} />
 
       {nodes.map((n, i) => (
@@ -254,7 +254,7 @@ function Scene({
           label={shortenAddress(n.address)}
           sublabel={n.label ?? (n.type === "victim" ? "Victim Reported" : n.type.toUpperCase())}
           appear={staged}
-          pulse={n.type === "exchange" || (selected === i && n.type !== "exchange")}
+          pulse={n.type === "exchange" || (selected === i && (n.type as string) !== "exchange")}
           onClick={() => setSelected(i)}
         />
       ))}

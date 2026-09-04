@@ -27,7 +27,7 @@ export default function SplineScene() {
     <div ref={containerRef} className="absolute inset-0">
       {mounted && (
         <iframe
-          src={`${SPLINE_URL}?output=dnt`}
+          src={SPLINE_URL}
           frameBorder="0"
           width="100%"
           height="100%"
@@ -39,18 +39,11 @@ export default function SplineScene() {
         />
       )}
 
-      {(!mounted || !loaded) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gradient-to-b from-bg via-surface to-bg">
-          <div className="relative h-14 w-14">
-            <div className="absolute inset-0 animate-ping rounded-full border border-trace/40" />
-            <div className="absolute inset-2 animate-pulse rounded-full bg-trace/20" />
-            <div className="absolute inset-4 rounded-full bg-trace/40 blur-sm" />
+        {(!mounted || !loaded) && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="mono text-text-muted">Loading 3D scene…</span>
           </div>
-          <span className="mono text-[10px] uppercase tracking-[0.25em] text-text-muted">
-            booting trace engine
-          </span>
-        </div>
-      )}
+        )}
     </div>
   );
 }

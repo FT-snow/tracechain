@@ -8,27 +8,27 @@ import Reveal from "./Reveal";
 const faqs = [
   {
     q: "How does wallet tracing actually work?",
-    a: "You submit a suspect wallet address. TraceChain runs an automated BFS/DFS traversal across BTC, ETH, BSC and USDT-TRC20, following fund flow hop-by-hop via free-tier chain APIs — no manual lookups.",
+    a: "TraceChain traverses fund flow hop-by-hop across BTC, ETH, BSC and USDT-TRC20 automatically.",
   },
   {
     q: "Do I need blockchain training to use it?",
-    a: "No. The interface is plain-language, self-serve. A constable with zero blockchain background can submit an address and get a court-ready report end to end.",
+    a: "No — the plain-language interface lets anyone submit an address and get a report.",
   },
   {
-    q: "How fast is the trace?",
-    a: "A standard 3–5 hop trace resolves to an exchange in under a minute. Compare that to days of manual forensic work.",
+    q: "How fast is an investigation?",
+    a: "A standard three-to-five hop investigation resolves to an exchange in under a minute.",
   },
   {
     q: "Is the evidence usable in court?",
-    a: "Yes. Every generated report is SHA-256 chain-of-custody hashed at creation, making it tamper-proof and legally defensible — not just a readable PDF.",
+    a: "Yes — every report is SHA-256 hashed, making it tamper-proof and legally defensible.",
   },
   {
-    q: "Does it keep watching after the trace?",
-    a: "Live Watch polls registered wallets continuously. If dormant funds move later, the system re-triggers tracing and sends an automatic alert.",
+    q: "Does it keep watching afterwards?",
+    a: "Live Watch polls registered wallets and alerts you if dormant funds later move.",
   },
   {
     q: "What does it cost to deploy?",
-    a: "It runs on free-tier chain APIs, so per-station deployment cost stays near zero — unlike lakhs-per-seat enterprise forensic licenses.",
+    a: "It runs on free-tier chain APIs, keeping per-station deployment cost near zero.",
   },
 ];
 
@@ -39,11 +39,8 @@ export default function Faq() {
     <section id="faq" className="border-t border-border">
       <div className="mx-auto max-w-3xl px-5 py-24 md:px-8 md:py-32">
         <Reveal className="mb-14 text-center">
-          <span className="mono text-[11px] uppercase tracking-[0.22em] text-trace">
+          <h2 className="text-4xl font-bold text-text-primary md:text-5xl">
             Questions
-          </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight text-text-primary md:text-4xl">
-            Frequently asked
           </h2>
         </Reveal>
 
@@ -63,9 +60,9 @@ export default function Faq() {
                   <motion.span
                     animate={{ rotate: isOpen ? 45 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border text-text-secondary"
+                    className="flex shrink-0"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-text-secondary" />
                   </motion.span>
                 </button>
                 <AnimatePresence initial={false}>

@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import { Providers } from "@/components/providers";
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-technical",
@@ -32,9 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}    >
-      <body className="min-h-full flex flex-col bg-bg text-text-primary">
-        {children}
+      className={`${geistMono.variable} h-full antialiased`}    >
+      <body className="min-h-screen bg-bg text-text-primary">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

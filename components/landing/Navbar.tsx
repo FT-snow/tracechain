@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Menu, X } from "lucide-react";
 
 const links = [
   { label: "Product", href: "#product" },
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -25,21 +21,13 @@ export default function Navbar() {
 
   return (
     <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        scrolled
-          ? "border-b border-border/80 bg-bg/80 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
-      )}
+      className={`fixed inset-x-0 top-0 z-50 border-b bg-bg transition-colors duration-300 ${
+        scrolled ? "border-border" : "border-transparent"
+      }`}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
-        <a href="#" className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md border border-trace/40 bg-trace/10">
-            <span className="block h-2.5 w-2.5 rounded-sm bg-trace shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">
-            Trace<span className="text-trace">Chain</span>
-          </span>
+        <a href="#" className="text-lg font-bold tracking-tight text-text-primary">
+          TraceChain
         </a>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -54,57 +42,40 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="#cta"
-            className="group inline-flex items-center gap-1.5 rounded-md bg-text-primary px-4 py-2 text-sm font-semibold text-bg transition-colors hover:bg-text-secondary"
-          >
-            Request Demo
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <div className="hidden md:flex">
+          <a href="/trace" className="btn-primary px-4 py-2">
+            Trace
           </a>
         </div>
 
         <button
           onClick={() => setOpen((o) => !o)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center border border-border text-text-secondary md:hidden"
           aria-label="Toggle menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden border-b border-border bg-bg/95 backdrop-blur-md md:hidden"
-          >
-            <div className="flex flex-col gap-1 px-5 py-4">
-              {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2.5 text-sm text-text-secondary hover:bg-surface-2 hover:text-text-primary"
-                >
-                  {l.label}
-                </a>
-              ))}
+      {open && (
+        <div className="border-b border-border bg-bg md:hidden">
+          <div className="flex flex-col px-5 py-4">
+            {links.map((l) => (
               <a
-                href="#cta"
+                key={l.href}
+                href={l.href}
                 onClick={() => setOpen(false)}
-                className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-md bg-text-primary px-4 py-2.5 text-sm font-semibold text-bg"
+                className="py-2.5 text-sm text-text-secondary hover:text-text-primary"
               >
-                Request Demo
-                <ArrowUpRight className="h-4 w-4" />
+                {l.label}
               </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+            <a href="/trace" onClick={() => setOpen(false)} className="btn-primary mt-2 py-2.5 text-center">
+              Trace
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

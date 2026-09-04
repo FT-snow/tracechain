@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
 
 export const WalletType = v.union(
   v.literal("unknown"),
@@ -37,6 +38,7 @@ export const AlertType = v.union(
 );
 
 export default defineSchema({
+  ...authTables,
   wallets: defineTable({
     address: v.string(),
     chain: Chain,

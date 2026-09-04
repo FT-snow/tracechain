@@ -1,20 +1,34 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Norse";
+  src: url("/fonts/Norse.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Norse";
+  src: url("/fonts/Norsebold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --surface-2: #1a1a1a;
-  --surface-3: #222222;
-  --border: #2a2a2a;
-  --border-subtle: #1e1e1e;
+  --bg: #000000;
+  --surface: #030303;
+  --surface-2: #0a0a0a;
+  --surface-3: #141414;
+  --border: #1c1c1c;
+  --border-subtle: #101010;
   --text-primary: #f5f5f5;
   --text-secondary: #888888;
   --text-muted: #555555;
   --risk-hi: #ff3b3b;
   --risk-med: #ff9500;
   --risk-low: #00d68f;
-  --info: #3b82f6;
-  --trace: #a855f7;
 }
 
 @theme inline {
@@ -30,9 +44,7 @@
   --color-risk-hi: var(--risk-hi);
   --color-risk-med: var(--risk-med);
   --color-risk-low: var(--risk-low);
-  --color-info: var(--info);
-  --color-trace: var(--trace);
-  --font-sans: var(--font-space);
+  --font-sans: "Norse", sans-serif;
   --font-mono: var(--font-technical);
 }
 
@@ -43,7 +55,7 @@
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: var(--font-sans);
+  font-family: "Norse", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -56,7 +68,7 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--surface-3);
-  border-radius: 4px;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border);
@@ -65,35 +77,34 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 0.625rem;
+  border-radius: 4px;
 }
 
 .input {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 4px;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s;
 }
 .input:focus {
-  border-color: var(--info);
-  box-shadow: 0 0 0 1px var(--info);
+  border-color: var(--text-secondary);
 }
 
 .btn-primary {
-  background: var(--info);
-  color: #000;
-  border-radius: 0.5rem;
-  font-weight: 600;
+  background: var(--text-primary);
+  color: var(--bg);
+  border-radius: 4px;
+  font-weight: 700;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  transition: opacity 0.15s, filter 0.15s;
+  transition: background 0.15s;
 }
 .btn-primary:hover {
-  filter: brightness(1.1);
+  background: var(--text-secondary);
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -101,16 +112,16 @@ body {
 }
 
 .btn-ghost {
-  background: var(--surface-2);
+  background: transparent;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 4px;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   color: var(--text-primary);
   transition: background 0.15s;
 }
 .btn-ghost:hover {
-  background: var(--surface-3);
+  background: var(--surface-2);
 }
 
 .mono {
@@ -122,8 +133,4 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.text-glitch-glow {
-  text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
 }
