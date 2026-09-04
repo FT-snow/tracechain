@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { EXCHANGE_LABELS } from "@/lib/chain/exchange-labels/dataset";
 import { matchExchange } from "@/lib/chain/exchange-labels/matcher";
 import { checkApiKey } from "@/lib/auth";
+import { traceAddress, detectChain, ChainId } from "@/lib/chain/traverse";
 
 const CHAINS = ["BTC", "ETH", "BSC", "TRX"];
 
@@ -69,6 +70,47 @@ export async function POST(req: Request) {
     }
 
     const chain = CHAINS.includes(body.chain) ? body.chain : inferChain(address);
+
+    // ---- live traversal first ----
+    const chainId: ChainId =
+      chain === "BTC" ? "btc" : chain === "TRX" ? "tron" : chain === "BSC" ? "bsc" : "eth";
+    const live = await traceAddress(address, chainId, 4).catch(() => null);
+
+    if (live && live.hops.length > 0) {
+      const finalTo = live.hops[live.hops.length - 1].to;
+      const ex = matchExchange(finalTo, chainId);
+      const mixerContact = false;
+      const riskScore = Math.min(
+        99,
+        Math.round(
+          15 +
+            live.hops.length * 10 +
+            (ex ? 35 : 12)
+        )
+      );
+      return NextResponse.json({
+        address,
+        chain,
+        source: "live",
+        probes: live.probes,
+        stoppedOn: live.stoppedOn,
+        hops: live.hops,
+        exchangeMatch: ex
+          ? { name: ex.name, depositAddress: ex.address, confidence: 0.99 }
+          : null,
+        mixerContact,
+        riskScore,
+        riskBreakdown: {
+          hopCount: live.hops.length,
+          mixerContact,
+          velocity: 0,
+          exchangeConfidence: ex ? 0.99 : 0,
+        },
+        generatedAt: new Date().toISOString(),
+      });
+    }
+
+    // ---- deterministic simulation fallback ----
     const r = rng(seedFrom(address.toLowerCase()));
 
     const hopCount = 2 + Math.floor(r() * 4);
@@ -121,6 +163,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       address,
       chain,
+      source: "simulated",
+      probes: [],
+      stoppedOn: "simulated",
       hops,
       exchangeMatch,
       mixerContact,

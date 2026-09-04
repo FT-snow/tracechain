@@ -13,6 +13,7 @@ export default function TracePage() {
   const [buildingHops, setBuildingHops] = useState(0);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [source, setSource] = useState<string | null>(null);
 
   const startTrace = async () => {
     const targetAddr = input.trim();
@@ -21,6 +22,7 @@ export default function TracePage() {
     setTrace(null);
     setBuildingHops(0);
     setError(null);
+    setSource(null);
 
     try {
       const res = await fetch("/api/trace", {
@@ -35,6 +37,8 @@ export default function TracePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Trace failed");
+
+      setSource(data.source === "live" ? "live" : "simulated");
 
       const hops: Hop[] = data.hops.map((h: Hop, i: number) => {
         const isLast = i === data.hops.length - 1;
@@ -102,6 +106,12 @@ export default function TracePage() {
         <p className="mt-1 text-sm text-text-secondary">
           Submit a suspect wallet address. Get a real-time trace in seconds.
         </p>
+        {source && (
+          <span className="mono mt-2 inline-block text-[10px] uppercase tracking-[0.16em] text-text-muted">
+            source: {source}
+            {source === "live" ? " · blockchain apis" : " · sandbox engine"}
+          </span>
+        )}
       </div>
 
       {/* Input */}

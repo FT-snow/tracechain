@@ -55,7 +55,7 @@ async function trace(args) {
   const time = (t) => new Date(t).toISOString().replace("T", " ").slice(0, 19);
 
   console.log(`TRACE ${data.address}`);
-  console.log(`chain: ${data.chain}   risk: ${data.riskScore}/99${data.mixerContact ? "   mixer contact: yes" : ""}`);
+  console.log(`chain: ${data.chain}   risk: ${data.riskScore}/99   source: ${data.source === "live" ? "live chain apis" : "simulated"}${data.stoppedOn && data.source === "live" ? `   stopped: ${data.stoppedOn}` : ""}${data.mixerContact ? "   mixer contact: yes" : ""}`);
   if (data.exchangeMatch) {
     console.log(`exchange: ${data.exchangeMatch.name} (confidence ${data.exchangeMatch.confidence})`);
     console.log(`deposit:  ${data.exchangeMatch.depositAddress}`);
