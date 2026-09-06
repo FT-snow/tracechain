@@ -33,10 +33,16 @@ interface TraceInput {
 }
 
 async function callLLM(prompt: string): Promise<string> {
+  const key = (process.env.OPENROUTER_API_KEY ?? "").trim();
+  if (!key || /^your/i.test(key)) {
+    throw new Error(
+      "MISSING KEY — OPENROUTER_API_KEY env var is not set on this deployment. Add it in Vercel → Settings → Environment Variables, then redeploy."
+    );
+  }
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://tracechain.dev",
       "X-Title": "TraceChain Report Generator",
@@ -55,7 +61,14 @@ async function callLLM(prompt: string): Promise<string> {
       temperature: 0.3,
     }),
   });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}`);
+  if (!res.ok) {
+    const bodyText = await res.text().catch(() => "");
+    if (res.status === 401)
+      throw new Error(
+        `OpenRouter 401 — key REJECTED. The OPENROUTER_API_KEY on this deployment is invalid/expired or malformed (quotes/spaces). Key present but invalid. Body: ${bodyText.slice(0, 120)}`
+      );
+    throw new Error(`OpenRouter ${res.status}: ${bodyText.slice(0, 120)}`);
+  }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
 }
