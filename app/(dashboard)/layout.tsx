@@ -25,10 +25,12 @@ const nav = [
   { label: "Home", href: "/" },
   { label: "Dashboard", href: "/dashboard" },
   { label: "Trace Wallet", href: "/trace" },
+  { label: "NFTs", href: "/nft" },
   { label: "Live Watch", href: "/watch" },
   { label: "Reports", href: "/reports" },
   { label: "Correlations", href: "/correlations" },
   { label: "Heat Map", href: "/heatmap" },
+  { label: "Terminal", href: "/terminal" },
   { label: "Settings", href: "/settings" },
 ];
 

@@ -276,6 +276,13 @@ function Scene({
       <directionalLight position={[6, 12, 8]} intensity={1.2} color="#ffffff" />
       <directionalLight position={[-8, -4, -6]} intensity={0.4} color="#888888" />
 
+      {[6, 10.5, 15, 19.5].map((r) => (
+        <mesh key={r} rotation={[Math.PI / 2, 0, 0]} position={[0, -3.4, 0]}>
+          <torusGeometry args={[r, 0.012, 6, 72]} />
+          <meshBasicMaterial color="#2a2a2a" transparent opacity={0.35} />
+        </mesh>
+      ))}
+
       {nodes.map((n, i) => (
         <Node
           key={n.address}

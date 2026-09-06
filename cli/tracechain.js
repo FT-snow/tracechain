@@ -6,6 +6,7 @@ const USAGE = `tracechain — wallet tracing CLI
 usage:
   tracechain trace <wallet-address> [--chain BTC|ETH|BSC|TRX] [--json]
   tracechain nft <eth-address> [--json]
+  tracechain report <wallet-address>       trace + court-ready report
   tracechain help
 
 env:
@@ -132,10 +133,57 @@ async function nft(args) {
   );
 }
 
+const headers = () => ({
+  "Content-Type": "application/json",
+  ...(process.env.TRACECHAIN_API_KEY
+    ? { "x-api-key": process.env.TRACECHAIN_API_KEY }
+    : {}),
+});
+
+async function report(args) {
+  const address = args.find((a) => !a.startsWith("--"));
+  if (!address) {
+    console.error("error: missing wallet address\n");
+    console.log(USAGE);
+    process.exit(1);
+  }
+
+  let res;
+  try {
+    const t = await fetch(`${BASE}/api/trace`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ address }),
+    });
+    const trace = await t.json();
+    if (!t.ok) {
+      console.error(`error (trace): ${trace.error || t.status}`);
+      process.exit(1);
+    }
+    console.error(`trace ok (${trace.source}, ${trace.hops.length} hops) — writing report…`);
+    res = await fetch(`${BASE}/api/report`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify(trace),
+    });
+  } catch {
+    console.error(`error: cannot reach ${BASE} — is the server running?`);
+    process.exit(1);
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error(`error (report): ${data.error || res.status}`);
+    process.exit(1);
+  }
+  console.log(data.report ?? JSON.stringify(data, null, 2));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 
 if (cmd === "trace") await trace(args);
 else if (cmd === "nft") await nft(args);
+else if (cmd === "report") await report(args);
 else if (cmd === "help" || !cmd) console.log(USAGE);
 else {
   console.error(`unknown command: ${cmd}\n`);
