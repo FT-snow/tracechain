@@ -47,8 +47,7 @@ export interface BlockscoutCandidate {
 
 export async function getBlockscoutEthCandidates(
   address: string
-): Promise<{ cands: BlockscoutCandidate[]; ok: boolean }> {
-  const addr = address.toLowerCase();
+): Promise<{ cands: BlockscoutCandidate[]; ok: boolean }> {  const addr = address.toLowerCase();
   const [native, tokens] = await Promise.all([
     get(`${ETH_BASE}/api/v2/addresses/${address}/transactions`),
     get(`${ETH_BASE}/api/v2/addresses/${address}/token-transfers?type=ERC-20`),
@@ -93,4 +92,55 @@ export async function getBlockscoutEthCandidates(
     cands: [...agg.values()].sort((a, b) => b.amount - a.amount),
     ok: true,
   };
+}
+
+export interface NftTransfer {
+  collection: string;
+  symbol: string;
+  contract: string;
+  tokenId: string;
+  standard: string;
+  from: string;
+  to: string;
+  txHash: string;
+  timestamp: number;
+}
+
+export async function getNftTransfers(
+  address: string
+): Promise<{ transfers: NftTransfer[]; ok: boolean }> {
+  const addr = address.toLowerCase();
+  const out: NftTransfer[] = [];
+  let anyOk = false;
+
+  for (const type of ["ERC-721", "ERC-1155"]) {
+    const r = await get(
+      `${ETH_BASE}/api/v2/addresses/${address}/token-transfers?type=${type}`
+    );
+    if (!r.ok) continue;
+    anyOk = true;
+    for (const t of ((r.json?.items ?? []) as Record<string, unknown>[])) {
+      const from = (t.from as { hash?: string } | undefined)?.hash ?? "";
+      const to = (t.to as { hash?: string } | undefined)?.hash ?? "";
+      if (!to) continue;
+      out.push({
+        collection:
+          (t.token as { name?: string })?.name ??
+          (t.token as { symbol?: string })?.symbol ??
+          "unknown",
+        symbol: (t.token as { symbol?: string })?.symbol ?? "",
+        contract: (t.token as { address_hash?: string })?.address_hash ?? "",
+        tokenId: String(
+          (t.total as { token_id?: string | number })?.token_id ?? ""
+        ).slice(0, 24),
+        standard: (t.token as { type?: string })?.type ?? type,
+        from,
+        to,
+        txHash: (t.transaction_hash as string) ?? "",
+        timestamp: parseTs(t.timestamp as string),
+      });
+    }
+  }
+
+  return { transfers: out, ok: anyOk };
 }
