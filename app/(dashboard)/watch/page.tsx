@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { demoAlerts } from "@/lib/data";
 import { timeAgo } from "@/lib/utils";
 
@@ -10,6 +10,15 @@ interface Watched {
   since: number;
 }
 
+interface PollResult {
+  risk: number | null;
+  source: string;
+  hops: number;
+  exchange: string | null;
+  lastChecked: number;
+  failed?: boolean;
+}
+
 function inferChain(address: string) {
   if (/^0x[a-fA-F0-9]{40}$/.test(address)) return "ETH";
   if (/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(address)) return "BTC";
@@ -17,20 +26,87 @@ function inferChain(address: string) {
   return "ETH";
 }
 
+const POLL_MS = 60_000;
+
 export default function WatchPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [watched, setWatched] = useState<Watched[]>([]);
+  const [results, setResults] = useState<Record<string, PollResult>>({});
+  const [polling, setPolling] = useState(false);
+  const pollingRef = useRef(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("tracechain_watch");
     if (raw) setWatched(JSON.parse(raw));
+    const rawR = localStorage.getItem("tracechain_watch_results");
+    if (rawR) setResults(JSON.parse(rawR));
   }, []);
 
   const persist = (list: Watched[]) => {
     setWatched(list);
     localStorage.setItem("tracechain_watch", JSON.stringify(list));
   };
+
+  const poll = useCallback(async (list: Watched[]) => {
+    if (pollingRef.current || list.length === 0) return;
+    pollingRef.current = true;
+    setPolling(true);
+    const next: Record<string, PollResult> = { ...results };
+    for (const w of list) {
+      try {
+        const res = await fetch("/api/trace", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY
+              ? { "x-api-key": process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY }
+              : {}),
+          },
+          body: JSON.stringify({ address: w.address }),
+        });
+        const d = await res.json();
+        if (res.ok) {
+          next[w.address] = {
+            risk: d.riskScore ?? null,
+            source: d.source === "live" ? "live" : "simulated",
+            hops: (d.hops ?? []).length,
+            exchange: d.exchangeMatch?.name ?? null,
+            lastChecked: Date.now(),
+          };
+        } else {
+          next[w.address] = {
+            risk: null,
+            source: "error",
+            hops: 0,
+            exchange: null,
+            lastChecked: Date.now(),
+            failed: true,
+          };
+        }
+      } catch {
+        next[w.address] = {
+          risk: null,
+          source: "error",
+          hops: 0,
+          exchange: null,
+          lastChecked: Date.now(),
+          failed: true,
+        };
+      }
+    }
+    setResults(next);
+    localStorage.setItem("tracechain_watch_results", JSON.stringify(next));
+    pollingRef.current = false;
+    setPolling(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    poll(watched);
+    const t = setInterval(() => poll(watched), POLL_MS);
+    return () => clearInterval(t);
+  }, [watched, poll]);
 
   const add = () => {
     const addr = input.trim();
@@ -107,9 +183,38 @@ export default function WatchPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="mono text-[10px] uppercase tracking-wider text-risk-low">
-                    polling
-                  </span>
+                  {(() => {
+                    const r = results[w.address];
+                    if (!r) {
+                      return (
+                        <span className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                          queued
+                        </span>
+                      );
+                    }
+                    if (r.failed) {
+                      return (
+                        <span className="mono text-[10px] uppercase tracking-wider text-risk-hi">
+                          check failed
+                        </span>
+                      );
+                    }
+                    return (
+                      <div className="flex items-center gap-3 text-right">
+                        <div>
+                          <div className="mono text-xs font-bold text-text-primary">
+                            {r.risk}/99
+                          </div>
+                          <div className="mono text-[9px] text-text-muted">
+                            {r.source} · {r.hops} hops
+                          </div>
+                        </div>
+                        <span className="mono text-[9px] text-text-muted">
+                          {timeAgo(r.lastChecked)}
+                        </span>
+                      </div>
+                    );
+                  })()}
                   <button
                     onClick={() => remove(w.address)}
                     className="mono text-xs text-text-muted transition-colors hover:text-risk-hi"
