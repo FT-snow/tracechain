@@ -57,7 +57,7 @@ function inferChain(address: string): string {
 
 export async function POST(req: Request) {
   if (!checkApiKey(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "API key required — server has TRACECHAIN_API_KEY set but request sent no matching x-api-key header" }, { status: 401 });
   }
   try {
     const body = await req.json();

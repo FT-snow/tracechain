@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { TraceResult } from "@/lib/data";
 import { shortenAddress } from "@/lib/utils";
 
@@ -12,14 +13,16 @@ interface Report {
 }
 
 export default function ReportsPage() {
+  const params = useSearchParams();
+  const autoRan = useRef(false);
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const generate = async () => {
-    const address = input.trim();
+  const generate = async (override?: string) => {
+    const address = (override ?? input).trim();
     if (address.length < 20) {
       setError("Enter a valid wallet address");
       return;
@@ -72,6 +75,16 @@ export default function ReportsPage() {
     }
   };
 
+  useEffect(() => {
+    const q = params.get("address");
+    if (q && !autoRan.current) {
+      autoRan.current = true;
+      setInput(q);
+      generate(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -92,7 +105,7 @@ export default function ReportsPage() {
           placeholder="Wallet address to report on"
           className="input flex-1 font-mono text-sm"
         />
-        <button onClick={generate} disabled={generating} className="btn-primary">
+        <button onClick={() => generate()} disabled={generating} className="btn-primary">
           {generating ? "Generating…" : "Generate Report"}
         </button>
       </div>

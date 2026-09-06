@@ -62,7 +62,7 @@ async function callLLM(prompt: string): Promise<string> {
 
 export async function POST(req: Request) {
   if (!checkApiKey(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "API key required — server has TRACECHAIN_API_KEY set but request sent no matching x-api-key header" }, { status: 401 });
   }
   try {
     const input: TraceInput = await req.json();

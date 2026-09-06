@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { demoAlerts } from "@/lib/data";
 import { timeAgo } from "@/lib/utils";
 
@@ -29,6 +30,8 @@ function inferChain(address: string) {
 const POLL_MS = 60_000;
 
 export default function WatchPage() {
+  const params = useSearchParams();
+  const autoAdded = useRef(false);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [watched, setWatched] = useState<Watched[]>([]);
@@ -108,8 +111,8 @@ export default function WatchPage() {
     return () => clearInterval(t);
   }, [watched, poll]);
 
-  const add = () => {
-    const addr = input.trim();
+  const add = (override?: string) => {
+    const addr = (override ?? input).trim();
     if (addr.length < 20) {
       setError("Address too short");
       return;
@@ -125,6 +128,20 @@ export default function WatchPage() {
 
   const remove = (address: string) =>
     persist(watched.filter((w) => w.address !== address));
+
+  useEffect(() => {
+    const q = params.get("address");
+    if (!q || autoAdded.current) return;
+    autoAdded.current = true;
+    const current: Watched[] = JSON.parse(
+      localStorage.getItem("tracechain_watch") || "[]"
+    );
+    if (!current.some((w) => w.address === q)) {
+      const next = [...current, { address: q, chain: inferChain(q), since: Date.now() }];
+      setWatched(next);
+      localStorage.setItem("tracechain_watch", JSON.stringify(next));
+    }
+  }, [params]);
 
   return (
     <div className="space-y-6">
@@ -146,7 +163,7 @@ export default function WatchPage() {
           placeholder="Paste wallet address to watch"
           className="input flex-1 font-mono text-sm"
         />
-        <button onClick={add} className="btn-primary">
+        <button onClick={() => add()} className="btn-primary">
           Watch
         </button>
       </div>

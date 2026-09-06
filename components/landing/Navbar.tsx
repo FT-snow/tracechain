@@ -26,7 +26,7 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
-        <a href="#" className="text-lg font-bold tracking-tight text-text-primary">
+        <a href="/" className="text-lg font-bold tracking-tight text-text-primary">
           TraceChain
         </a>
 
