@@ -61,7 +61,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        <div className="relative hidden h-[calc(100vh-4rem)] bg-bg lg:block">
+        <div className="relative hidden h-[calc(100vh-4rem)] lg:block">
           <SplineScene />
         </div>
       </div>
