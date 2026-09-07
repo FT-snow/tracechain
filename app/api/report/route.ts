@@ -49,16 +49,17 @@ async function callLLM(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: MODEL,
+      provider: { sort: "throughput" },
       messages: [
         {
           role: "system",
           content:
-            "You are a law-enforcement report writer for Indian cybercrime cells. Write formal, clear, court-ready text in English. Use plain language suitable for a non-technical officer. Output structured markdown.",
+            "You are a law-enforcement report writer for Indian cybercrime cells. Write formal, clear, court-ready text in English. Use plain language suitable for a non-technical officer. Output structured markdown. Be concise.",
         },
         { role: "user", content: prompt },
       ],
-      max_tokens: 4096,
-      temperature: 0.3,
+      max_tokens: 3200,
+      temperature: 0.2,
     }),
   });
   if (!res.ok) {
@@ -119,30 +120,19 @@ Generate:
 5. Recommended Actions (numbered list)
 6. Disclaimer
 
-Format as clean markdown suitable for PDF conversion.`;
+Then add a final section:
 
-    const freezePrompt = `Generate a FORMAL FREEZE REQUEST LETTER addressed to the compliance department of ${input.exchangeMatch?.name ?? "the identified exchange"}.
+---
 
-This letter requests an immediate freeze on the following deposit address: ${input.exchangeMatch?.depositAddress ?? "N/A"}
-Confidence of funds landing: ${input.exchangeMatch?.confidence ?? 0}%
-Total traced amount: ${input.hops[input.hops.length - 1]?.amount ?? 0} ${input.hops[input.hops.length - 1]?.chain.toUpperCase() ?? ""}
+# FREEZE REQUEST LETTER
 
-Use formal Indian law-enforcement letter format. Include:
-1. Case reference header
-2. Authority statement
-3. Request for immediate freeze
-4. Supporting details (wallet addresses, transaction hashes)
-5. Legal basis reference
-6. Contact information
+Formal Indian law-enforcement letter to the compliance department of ${input.exchangeMatch?.name ?? "the identified exchange"} requesting immediate freeze of the deposit address ${input.exchangeMatch?.depositAddress ?? "N/A"} (funds-landing confidence ${input.exchangeMatch?.confidence ?? 0}%, total traced ${input.hops[input.hops.length - 1]?.amount ?? 0} ${String(input.hops[input.hops.length - 1]?.chain ?? "").toUpperCase()}). Include: case reference header, authority statement, freeze request, supporting details (addresses + tx hashes), legal basis, contact block.
 
-Format as clean markdown suitable for PDF conversion.`;
+Keep the whole output tight — no filler, no repetition. Format as clean markdown suitable for PDF conversion.`;
 
-    const [reportMd, freezeMd] = await Promise.all([
-      callLLM(reportPrompt),
-      callLLM(freezePrompt),
-    ]);
+    const combined = await callLLM(reportPrompt);
 
-    const sha256Input = JSON.stringify({ ...input, reportMd, generatedAt: new Date().toISOString() });
+    const sha256Input = JSON.stringify({ ...input, reportMd: combined, generatedAt: new Date().toISOString() });
     const hashBuffer = await crypto.subtle.digest(
       "SHA-256",
       new TextEncoder().encode(sha256Input)
@@ -152,8 +142,8 @@ Format as clean markdown suitable for PDF conversion.`;
       .join("");
 
     return NextResponse.json({
-      report: reportMd,
-      freezeLetter: freezeMd,
+      report: combined,
+      freezeLetter: "",
       sha256Hash,
       generatedAt: new Date().toISOString(),
     });
