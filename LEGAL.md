@@ -27,7 +27,7 @@ Tracing crypto is different from most digital forensics: the underlying data liv
 
 ## 4. The Indian legal frame — stated accurately
 
-- **Electronic records:** under the Bharatiya Sakshya Adhiniyam, 2023 (successor to the Indian Evidence Act, 1872 — formerly s.65B), computer output is admissible when accompanied by a certificate from a person in responsible official position describing the device/process that produced it and its integrity. **TraceChain's report is designed to slot into this workflow — the investigating officer signs the certificate; the tool supplies the underlying verifiable data.**
+- **Electronic records:** under the Bharatiya Sakshya Adhiniyam, 2023 — Section 63 (successor to s.65B of the Indian Evidence Act, 1872), computer output is admissible when accompanied by a certificate from a person in responsible official position describing the device/process that produced it and its integrity. **TraceChain's report is designed to slot into this workflow — the investigating officer signs the certificate; the tool supplies the underlying verifiable data.**
 - **Key honesty:** machine-generated output alone is not self-proving. The officer's attestation + the tool's independently verifiable on-chain transactions are what make the package strong. The tool generates drafts and corroboration; the officer owns the statement.
 - **Expert backing:** where complexity is challenged, a cyber-forensic examiner can independently re-run the trace and confirm identical public-ledger references — the outputs are reproducible, which ordinary proprietary black-box reports often are not.
 

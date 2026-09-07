@@ -47,8 +47,18 @@ export default function ReportsPage() {
       : {}),
   });
 
+  const readChain = (): string[] => {
+    try {
+      const raw = localStorage.getItem(CHAIN_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+    } catch {
+      return [];
+    }
+  };
+
   const lastHash = () => {
-    const chain: string[] = JSON.parse(localStorage.getItem(CHAIN_KEY) || '""');
+    const chain = readChain();
     return chain.length ? chain[chain.length - 1] : "";
   };
 
@@ -92,7 +102,7 @@ export default function ReportsPage() {
         datasetSha: rep.datasetSha ?? "",
       };
 
-      const chain: string[] = JSON.parse(localStorage.getItem(CHAIN_KEY) || '""');
+      const chain = readChain();
       chain.push(entry.contentHash);
       localStorage.setItem(CHAIN_KEY, JSON.stringify(chain));
 
@@ -179,7 +189,7 @@ generated: ${new Date(r.createdAt).toISOString()} · verify: ${r.verify ? r.veri
   };
 
   const chainLen = (() => {
-    const chain: string[] = JSON.parse(localStorage.getItem(CHAIN_KEY) || '""');
+    const chain = readChain();
     return chain.length;
   })();
 
