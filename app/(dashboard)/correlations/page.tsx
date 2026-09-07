@@ -1,8 +1,15 @@
 "use client";
 
+import HorizontalBarChart from "@/components/charts/HorizontalBarChart";
+import { Badge } from "@/components/ui/badge";
 import { demoCorrelations } from "@/lib/data";
 
 export default function CorrelationsPage() {
+  const clusterData = demoCorrelations.map((c) => ({
+    label: c.id,
+    value: c.walletCluster.length,
+  }));
+
   return (
     <div className="space-y-6">
       <div>
@@ -15,6 +22,18 @@ export default function CorrelationsPage() {
         </p>
       </div>
 
+      <div className="card p-5">
+        <h3 className="text-lg font-semibold text-text-primary">
+          Wallets per cluster
+        </h3>
+        <p className="mt-1 text-sm text-text-secondary">
+          Cluster size by linked deposit wallets
+        </p>
+        <div className="mt-4">
+          <HorizontalBarChart data={clusterData} valueLabel="wallets" />
+        </div>
+      </div>
+
       <div className="space-y-3">
         {demoCorrelations.map((c) => (
           <div key={c.id} className="card p-5">
@@ -24,16 +43,12 @@ export default function CorrelationsPage() {
                   <span className="mono text-xs font-semibold uppercase text-text-muted">
                     cluster {c.id}
                   </span>
-                  <span
-                    className="mono rounded px-1.5 py-0.5 text-xs font-bold uppercase"
-                    style={{
-                      color: c.strength > 80 ? "#000" : "var(--text-primary)",
-                      background:
-                        c.strength > 80 ? "var(--risk-hi)" : "var(--surface-3)",
-                    }}
+                  <Badge
+                    variant={c.strength > 80 ? "destructive" : "secondary"}
+                    className="mono font-bold uppercase"
                   >
                     strength {c.strength}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="mt-2 text-sm text-text-primary">{c.note}</p>
                 <div className="mono mt-3 space-y-1 text-[13px] text-text-secondary">

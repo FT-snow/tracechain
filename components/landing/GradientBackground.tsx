@@ -16,7 +16,7 @@ export default function GradientBackground() {
         >
           <ShaderGradient
             animate={reduceMotion ? "off" : "on"}
-            brightness={0.75}
+            brightness={1}
             cAzimuthAngle={180}
             cDistance={2.8}
             cPolarAngle={80}
@@ -49,7 +49,6 @@ export default function GradientBackground() {
           />
         </ShaderGradientCanvas>
       </div>
-      <div className="fixed inset-0 -z-10 bg-black/25" aria-hidden="true" />
     </>
   );
 }

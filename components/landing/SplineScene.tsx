@@ -32,7 +32,7 @@ export default function SplineScene() {
           width="100%"
           height="100%"
           onLoad={() => setLoaded(true)}
-          className="h-full w-full"
+          className="h-full w-full origin-[62%_58%] scale-[1.28]"
           style={{ background: "transparent" }}
           title="Cryptocurrency wallet tracing 3D visual"
           aria-label="3D visualization of cryptocurrency flow tracing"

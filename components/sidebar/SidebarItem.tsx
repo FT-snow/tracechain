@@ -31,19 +31,19 @@ export default function SidebarItem({ item, collapsed }: SidebarItemProps) {
         aria-current={active ? "page" : undefined}
         aria-label={collapsed ? item.label : undefined}
         className={cn(
-          "relative flex items-center gap-3 rounded-sm py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]",
+          "relative flex items-center gap-3 rounded-sm py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]",
           collapsed
             ? "mx-auto h-10 w-10 justify-center"
             : "px-3",
           active
-            ? "bg-[#22182E] text-text-primary"
-            : "text-text-secondary hover:bg-[#22182E] hover:text-text-primary",
+            ? "bg-[#221932] text-text-primary"
+            : "text-text-secondary hover:bg-[#221932] hover:text-text-primary",
         )}
       >
         {active && (
           <span
             aria-hidden="true"
-            className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[#A855F7]"
+            className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[#9882B9]"
           />
         )}
         <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />

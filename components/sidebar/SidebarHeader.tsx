@@ -14,13 +14,13 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
       <Link
         href="/dashboard"
         aria-label={collapsed ? "TraceChain home" : undefined}
-        className="flex items-center gap-2.5 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
+        className="flex items-center gap-2.5 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]"
       >
         <span
           aria-hidden="true"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-[#896ABD]/40 bg-[#17111F]"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-[#9882B9]/40 bg-[#1C1428]"
         >
-          <Radar className="h-4 w-4 text-[#A855F7]" />
+          <Radar className="h-4 w-4 text-[#9882B9]" />
         </span>
         {!collapsed && (
           <span className="text-base font-bold tracking-tight text-text-primary">
@@ -33,7 +33,7 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
         onClick={onToggle}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         aria-expanded={!collapsed}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]"
       >
         {collapsed ? (
           <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />

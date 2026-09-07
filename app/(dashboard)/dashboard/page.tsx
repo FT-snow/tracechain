@@ -48,7 +48,7 @@ export default function DashboardHome() {
             variants={item}
             className="card p-5"
           >
-            <div className="text-4xl font-bold tabular-nums text-[#896ABD]">
+            <div className="text-4xl font-bold tabular-nums text-[#9882B9]">
               <span className="sr-only">
                 {s.to}
                 {s.suffix === "s" ? " seconds" : ""} {s.label.toLowerCase()}

@@ -36,7 +36,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {...anim}
       variants={asideIn}
       className={cn(
-        "hidden shrink-0 flex-col border-r border-border bg-surface transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex",
+        "hidden shrink-0 flex-col border-r border-border bg-bg transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex",
         collapsed ? "w-20" : "w-60",
       )}
     >
