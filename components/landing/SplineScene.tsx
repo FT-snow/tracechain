@@ -39,8 +39,13 @@ export default function SplineScene() {
         />
       )}
 
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(155deg,rgba(6,2,4,0.82),rgba(26,9,34,0.6)_55%,rgba(6,2,4,0.85))]"
+      />
+
         {(!mounted || !loaded) && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
             <span className="mono text-text-muted">Loading 3D scene…</span>
           </div>
         )}

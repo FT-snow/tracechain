@@ -39,7 +39,7 @@ export function riskColor(score: number) {
 }
 
 export function riskLabel(score: number) {
-  if (score >= 70) return "HIGH";
-  if (score >= 40) return "MEDIUM";
-  return "LOW";
+  if (score >= 70) return "HIGH RISK";
+  if (score >= 40) return "NORMAL";
+  return "SAFE";
 }

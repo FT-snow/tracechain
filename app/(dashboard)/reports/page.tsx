@@ -98,20 +98,20 @@ export default function ReportsPage() {
       </div>
 
       {error && (
-        <div className="rounded-sm border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
+        <div className="rounded-lg border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
           <span className="text-sm text-risk-hi">{error}</span>
         </div>
       )}
 
       {reports.length === 0 && !generating && (
-        <div className="rounded-sm border border-dashed border-border py-20 text-center">
+        <div className="rounded-lg border border-dashed border-border py-20 text-center">
           <p className="text-sm text-text-secondary">
             Paste an address and generate the first report
           </p>
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {reports.map((r) => (
           <div key={r.id} className="card">
             <button

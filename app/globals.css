@@ -6,7 +6,7 @@
 
 :root {
   color-scheme: dark;
-  --bg: #060407;
+  --bg: #060204;
   --surface: #221932;
   --surface-2: #1c1428;
   --surface-3: #2e2140;
@@ -16,10 +16,14 @@
   --text-primary: #ffffff;
   --text-secondary: #9882b9;
   --text-muted: #85719e;
-  --risk-hi: #ff3b3b;
-  --risk-med: #ff9500;
-  --risk-low: #00d68f;
-  --chart-1: #775e88;
+  --danger: #a30e3e;
+  --normal: #7669a7;
+  --safe: #7a9655;
+  --safe-highlight: #a0b18f;
+  --risk-hi: var(--danger);
+  --risk-med: var(--normal);
+  --risk-low: var(--safe);
+  --chart-1: var(--normal);
   --chart-2: #9882b9;
   --chart-3: #722548;
   --accent: #722548;
@@ -37,8 +41,18 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-risk-hi: var(--risk-hi);
+
   --color-risk-med: var(--risk-med);
+
   --color-risk-low: var(--risk-low);
+
+  --color-danger: var(--danger);
+
+  --color-normal: var(--normal);
+
+  --color-safe: var(--safe);
+
+  --color-safe-highlight: var(--safe-highlight);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-border-card: var(--border-card);
@@ -87,15 +101,13 @@ body {
 }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border-card);
-  border-radius: 4px;
+  border-radius: 14px;
 }
 
 .input {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 0.5rem 0.75rem;
   font-size: 0.9375rem;
   color: var(--text-primary);
@@ -110,7 +122,7 @@ body {
 .btn-primary {
   background: var(--accent);
   color: #ffffff;
- border-radius: 4px;
+ border-radius: 10px;
  font-weight: 700;
  padding: 0.5rem 1rem;
  font-size: 0.9375rem;
@@ -118,7 +130,7 @@ body {
 }
 .btn-primary:hover {
  background: var(--accent-soft);
-  color: #060407;
+  color: #060204;
 }
 .btn-primary:focus-visible {
  outline: 2px solid var(--text-secondary);
@@ -132,7 +144,7 @@ body {
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--chart-1);
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 0.5rem 1rem;
   font-size: 0.9375rem;
   color: var(--text-primary);
@@ -158,9 +170,9 @@ body {
 }
 
 .landing-glass {
-  background: rgba(6, 4, 7, 0.4);
+  background: rgba(6, 2, 4, 0.4);
   border: 1px solid rgba(152, 130, 185, 0.16);
-  box-shadow: 0 8px 40px rgba(6, 4, 7, 0.5);
+  box-shadow: 0 8px 40px rgba(6, 2, 4, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -169,5 +181,5 @@ body {
   background:
     radial-gradient(ellipse 90% 55% at 50% -12%, rgba(114, 37, 72, 0.13), transparent 62%),
     radial-gradient(ellipse 70% 45% at 88% 108%, rgba(119, 94, 136, 0.07), transparent 65%),
-    linear-gradient(180deg, #060407 0%, #150d1d 55%, #060407 100%);
+    linear-gradient(180deg, #060204 0%, #150d1d 55%, #060204 100%);
 }

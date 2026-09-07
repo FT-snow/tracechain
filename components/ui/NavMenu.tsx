@@ -35,7 +35,7 @@ const MENUS: MenuGroup[] = [
     label: "Operations",
     leaves: [
       { label: "Live Watch", href: "/watch", meta: "/watch" },
-      { label: "Correlations", href: "/correlations", meta: "/correlations" },
+      { label: "Correlations", href: "/heatmap", meta: "/heatmap" },
       { label: "Activity map", href: "/heatmap", meta: "/heatmap" },
     ],
   },

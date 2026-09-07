@@ -48,7 +48,7 @@ function Sparkle({ className, delay = 0 }: { className?: string; delay?: number 
 
 function SplineViewport() {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-sm border border-[#9882B9]/25 bg-[#17111F]/25 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+    <div className="relative h-full w-full overflow-hidden rounded-lg border border-[#9882B9]/25 bg-black/50 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
       <SplineScene />
       <Sparkle className="left-[7%] top-[8%] h-5 w-5" />
       <Sparkle className="left-[4%] top-[28%] h-3 w-3" delay={1.2} />

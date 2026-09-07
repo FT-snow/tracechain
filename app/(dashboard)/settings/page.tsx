@@ -74,7 +74,7 @@ export default function SettingsPage() {
                 <button
                   key={c}
                   onClick={() => setChains({ ...chains, [c]: !chains[c] })}
-                  className={`rounded-sm border px-4 py-2 font-mono text-xs transition-colors ${
+                  className={`rounded-lg border px-4 py-2 font-mono text-xs transition-colors ${
                     chains[c]
                       ? "border-border bg-surface-3 text-text-primary"
                       : "border-border bg-transparent text-text-muted"
@@ -97,7 +97,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="rounded-sm border border-dashed border-border p-5">
+      <div className="rounded-lg border border-dashed border-border p-5">
         <div className="mono text-xs uppercase tracking-wider text-text-muted">
           cli access
         </div>

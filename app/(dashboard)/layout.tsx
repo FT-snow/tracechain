@@ -8,6 +8,7 @@ import { AnimatePresence, motion, useReducedMotion, Variants } from "framer-moti
 import { useConvexAuth, useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
 import Sidebar, { NAV_ITEMS } from "@/components/sidebar/Sidebar";
+import GradientBackground from "@/components/landing/GradientBackground";
 
 const headerIn: Variants = {
   hidden: { opacity: 0, y: -10 },
@@ -81,7 +82,8 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="flex h-dvh bg-bg">
+    <div className="flex h-dvh">
+      <GradientBackground brightness={0.75} scrim="bg-[#060204]/45" />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:bg-[#1C1428] focus:px-3 focus:py-2 focus:text-[15px] focus:text-text-primary"
@@ -113,7 +115,7 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
               animate={reduceMotion ? { opacity: 1 } : { x: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { x: "-100%" }}
               transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="relative z-10 w-60 overscroll-contain border-r border-border bg-bg"
+              className="relative z-10 w-60 overscroll-contain border-r border-border bg-bg/90 backdrop-blur-xl"
             >
               <div className="flex h-14 items-center justify-between border-b border-border px-4">
                 <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
@@ -123,7 +125,7 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
                   onClick={() => setMobileOpen(false)}
                   aria-label="Close navigation"
                   autoFocus
-                  className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -138,7 +140,7 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
                       onClick={() => setMobileOpen(false)}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-sm px-3 py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]",
+                        "flex items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9]",
                         active
                           ? "bg-surface-3 text-text-primary"
                           : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
@@ -159,14 +161,14 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
         <motion.header
           {...anim}
           variants={headerIn}
-          className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-bg px-4 md:px-6"
+          className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 md:px-6"
         >
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
-            className="flex h-9 w-9 items-center justify-center rounded border border-border text-text-secondary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9] md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9882B9] md:hidden"
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
           </button>

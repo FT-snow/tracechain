@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { BarChart3, Eye, FileText, LayoutDashboard, Map, Search } from "lucide-react";
+import { Eye, FileText, LayoutDashboard, Map, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SidebarHeader from "./SidebarHeader";
 import SidebarItem, { type SidebarItemData } from "./SidebarItem";
@@ -12,7 +12,6 @@ export const NAV_ITEMS: SidebarItemData[] = [
   { label: "Investigate", href: "/trace", icon: Search },
   { label: "Live Watch", href: "/watch", icon: Eye },
   { label: "Reports", href: "/reports", icon: FileText },
-  { label: "Analytics", href: "/correlations", icon: BarChart3 },
   { label: "Heat Map", href: "/heatmap", icon: Map },
 ];
 
@@ -36,7 +35,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {...anim}
       variants={asideIn}
       className={cn(
-        "hidden shrink-0 flex-col border-r border-border bg-bg transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex",
+        "hidden shrink-0 flex-col border-r border-border transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex",
         collapsed ? "w-20" : "w-60",
       )}
     >

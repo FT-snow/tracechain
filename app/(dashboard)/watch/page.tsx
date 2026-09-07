@@ -76,7 +76,7 @@ export default function WatchPage() {
       </div>
 
       {error && (
-        <div className="rounded-sm border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
+        <div className="rounded-lg border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
           <span className="text-sm text-risk-hi">{error}</span>
         </div>
       )}

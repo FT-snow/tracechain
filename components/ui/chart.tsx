@@ -78,7 +78,7 @@ function ChartTooltipContent({
   const label = item.payload?.label ?? "";
 
   return (
-    <div className="min-w-32 rounded-sm border border-border bg-surface-2 px-3 py-2 shadow-md">
+    <div className="min-w-32 rounded-lg border border-border bg-surface-2 px-3 py-2 shadow-md">
       <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
         {label}
       </div>

@@ -146,7 +146,7 @@ export default function TracePage() {
       </div>
 
       {error && (
-        <div className="rounded-sm border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
+        <div className="rounded-lg border border-risk-hi/40 bg-risk-hi/5 px-4 py-3">
           <span className="text-sm text-risk-hi">{error}</span>
         </div>
       )}
@@ -165,7 +165,7 @@ export default function TracePage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className="flex h-12 w-12 items-center justify-center rounded-sm border font-mono text-xl font-bold"
+                    className="flex h-12 w-12 items-center justify-center rounded-lg border font-mono text-xl font-bold"
                     style={{
                       borderColor: riskColor(trace.riskScore),
                       color: riskColor(trace.riskScore),
@@ -221,7 +221,7 @@ export default function TracePage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="rounded-sm border border-risk-hi/30 bg-risk-hi/5 p-5"
+                className="rounded-lg border border-risk-hi/30 bg-risk-hi/5 p-5"
               >
                 <div className="flex items-center gap-3">
                   <div>
@@ -263,7 +263,7 @@ export default function TracePage() {
               <h3 className="mb-4 text-lg font-semibold text-text-primary">
                 Explainability Panel
               </h3>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
                 {[
                   {
                     label: "Hop Count",
@@ -334,7 +334,7 @@ export default function TracePage() {
       </AnimatePresence>
 
       {!trace && !tracing && (
-        <div className="flex flex-col items-center justify-center rounded-sm border border-dashed border-border py-20">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20">
           <p className="text-sm text-text-secondary">
             Paste a wallet address above to begin tracing
           </p>
@@ -364,7 +364,7 @@ function HopCard({ hop, isFirst }: { hop: Hop; isFirst: boolean }) {
             Hop {hop.hopNumber}
           </span>
           <span
-            className="rounded px-1.5 py-0.5 text-xs font-semibold uppercase"
+            className="rounded-[6px] px-1.5 py-0.5 text-xs font-semibold uppercase"
             style={{ color: "#000", background: color }}
           >
             {hop.type}

@@ -40,7 +40,7 @@ export default function DashboardHome() {
         variants={container}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 gap-4 lg:grid-cols-4"
+        className="grid grid-cols-2 gap-5 lg:grid-cols-4"
       >
         {stats.map((s) => (
           <motion.div
@@ -119,7 +119,7 @@ export default function DashboardHome() {
             {["BTC", "ETH", "BSC", "TRX"].map((chain) => (
               <div
                 key={chain}
-                className="rounded-sm border border-border bg-surface-2 px-3 py-2"
+                  className="rounded-lg border border-border bg-surface-2 px-3 py-2"
               >
                 <span className="mono text-xs font-medium text-text-secondary">
                   {chain}
