@@ -25,21 +25,21 @@ export default function LandingPage() {
           speed={0.45}
           curvature={0.25}
           scanlineStrength={0.32}
-          scanlineFrequency={180}
-          waveAmplitude={0.22}
-          waveFrequency={2.5}
-          bloom={0.7}
-          bloomRadius={1}
-          noise={0.05}
+          scanlineFrequency={240}
+          waveAmplitude={0.16}
+          waveFrequency={4.2}
+          bloom={0.5}
+          bloomRadius={0.7}
+          noise={0.04}
           vignette={0.6}
-          brightness={1.15}
+          brightness={1.1}
           pixelation={1}
           rgbShift={0}
           mouseReact
-          mouseStrength={0.35}
+          mouseStrength={0.25}
           dpr={1}
           fps={30}
-          className="opacity-60"
+          className="opacity-40"
         />
         {/* flat scrim, not a gradient: typography first, ambience second */}
         <div className="absolute inset-0 bg-black/55" />
