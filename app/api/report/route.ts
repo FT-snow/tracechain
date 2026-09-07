@@ -78,12 +78,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "API key required — server has TRACECHAIN_API_KEY set but request sent no matching x-api-key header" }, { status: 401 });
   }
   try {
-    const input: TraceInput = await req.json();
+    const raw = await req.json();
+    const input: TraceInput = {
+      victimAddress: raw?.victimAddress ?? "unknown",
+      hops: Array.isArray(raw?.hops) ? raw.hops : [],
+      exchangeMatch: raw?.exchangeMatch ?? undefined,
+      riskScore: typeof raw?.riskScore === "number" ? raw.riskScore : 0,
+      riskBreakdown: {
+        hopCount: raw?.riskBreakdown?.hopCount ?? (Array.isArray(raw?.hops) ? raw.hops.length : 0),
+        mixerContact: Boolean(raw?.riskBreakdown?.mixerContact),
+        velocity: raw?.riskBreakdown?.velocity ?? 0,
+        exchangeConfidence: raw?.riskBreakdown?.exchangeConfidence ?? 0,
+      },
+      bridgeDetected: Boolean(raw?.bridgeDetected),
+      startedAt: raw?.startedAt ?? Date.now(),
+    };
 
-    const timeline = input.hops
+    const timeline = (input.hops ?? [])
       .map(
         (h) =>
-          `Hop ${h.hopNumber}: ${h.from} → ${h.to} | ${h.amount} ${h.chain.toUpperCase()} | tx: ${h.txHash} | ${new Date(h.timestamp * 1000).toISOString()}`
+          `Hop ${h?.hopNumber ?? "?"}: ${h?.from ?? "?"} → ${h?.to ?? "?"} | ${h?.amount ?? 0} ${String(h?.chain ?? "").toUpperCase()} | tx: ${h?.txHash ?? "?"} | ${new Date(h?.timestamp || Date.now()).toISOString()}`
       )
       .join("\n");
 

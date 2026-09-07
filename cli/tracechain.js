@@ -161,11 +161,26 @@ async function report(args) {
       process.exit(1);
     }
     console.error(`trace ok (${trace.source}, ${trace.hops.length} hops) — writing report…`);
-    res = await fetch(`${BASE}/api/report`, {
-      method: "POST",
-      headers: headers(),
-      body: JSON.stringify(trace),
-    });
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        res = await fetch(`${BASE}/api/report`, {
+          method: "POST",
+          headers: headers(),
+          body: JSON.stringify(trace),
+        });
+        lastErr = null;
+        break;
+      } catch (e) {
+        lastErr = e;
+        console.error(`report attempt ${attempt} failed — retrying…`);
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+    if (lastErr) {
+      console.error(`error: cannot reach ${BASE}/api/report after 3 attempts — ${lastErr.message}`);
+      process.exit(1);
+    }
   } catch {
     console.error(`error: cannot reach ${BASE} — is the server running?`);
     process.exit(1);
