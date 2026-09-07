@@ -75,10 +75,10 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Reports
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Court-ready investigation reports generated from a live trace.
         </p>
       </div>
@@ -122,7 +122,7 @@ export default function ReportsPage() {
                 <div className="font-mono text-sm text-text-primary">
                   {shortenAddress(r.address, 10, 6)}
                 </div>
-                <div className="mono mt-0.5 text-[10px] text-text-muted">
+                <div className="mono mt-0.5 text-[13px] text-text-muted">
                   {new Date(r.createdAt).toISOString().replace("T", " ").slice(0, 19)}
                 </div>
               </div>

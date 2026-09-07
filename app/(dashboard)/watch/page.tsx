@@ -53,10 +53,10 @@ export default function WatchPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Live Watch
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Registered wallets are polled continuously. Movement triggers alerts.
         </p>
       </div>
@@ -83,7 +83,7 @@ export default function WatchPage() {
 
       <div className="card">
         <div className="border-b border-border px-5 py-3">
-          <h3 className="text-sm font-semibold text-text-primary">
+          <h3 className="text-lg font-semibold text-text-primary">
             Watched Wallets
           </h3>
         </div>
@@ -102,12 +102,12 @@ export default function WatchPage() {
                   <div className="font-mono text-sm text-text-primary">
                     {w.address}
                   </div>
-                  <div className="mono mt-0.5 text-[10px] text-text-muted">
+                  <div className="mono mt-0.5 text-[13px] text-text-muted">
                     {w.chain} · since {new Date(w.since).toISOString().slice(0, 10)}
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="mono text-[10px] uppercase tracking-wider text-risk-low">
+                  <span className="mono text-xs uppercase tracking-wider text-risk-low">
                     polling
                   </span>
                   <button
@@ -125,7 +125,7 @@ export default function WatchPage() {
 
       <div className="card">
         <div className="border-b border-border px-5 py-3">
-          <h3 className="text-sm font-semibold text-text-primary">Alerts</h3>
+          <h3 className="text-lg font-semibold text-text-primary">Alerts</h3>
         </div>
         <div className="divide-y divide-border">
           {demoAlerts.map((a) => (
@@ -139,7 +139,7 @@ export default function WatchPage() {
               />
               <div className="flex-1">
                 <div className="text-sm text-text-primary">{a.message}</div>
-                <div className="mono mt-0.5 text-[10px] text-text-muted">
+                <div className="mono mt-0.5 text-[13px] text-text-muted">
                   {timeAgo(a.time)}
                 </div>
               </div>

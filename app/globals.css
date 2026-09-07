@@ -1,22 +1,11 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Norse";
-  src: url("/fonts/Norse.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Norse";
-  src: url("/fonts/Norsebold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* Display/UI face: Lastik Free (That That Type, free-fonts release).
+   Self-hosted via next/font/local in app/layout.tsx → exposes --font-display.
+   Technical face: Geist Mono via next/font/google → exposes --font-technical. */
 
 :root {
+  color-scheme: dark;
   --bg: #000000;
   --surface: #030303;
   --surface-2: #0a0a0a;
@@ -44,18 +33,29 @@
   --color-risk-hi: var(--risk-hi);
   --color-risk-med: var(--risk-med);
   --color-risk-low: var(--risk-low);
-  --font-sans: "Norse", sans-serif;
+  --font-sans: var(--font-display), sans-serif;
   --font-mono: var(--font-technical);
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: calc(1.375rem / 0.9375rem);
 }
 
 * {
   border-color: var(--border);
 }
 
+button,
+a,
+input,
+textarea,
+select {
+  touch-action: manipulation;
+}
+
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: "Norse", sans-serif;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -85,26 +85,31 @@ body {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-primary);
   outline: none;
   transition: border-color 0.15s;
 }
-.input:focus {
+.input:focus-visible {
   border-color: var(--text-secondary);
+  box-shadow: 0 0 0 1px var(--text-secondary);
 }
 
 .btn-primary {
   background: var(--text-primary);
   color: var(--bg);
-  border-radius: 4px;
-  font-weight: 700;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+ border-radius: 4px;
+ font-weight: 700;
+ padding: 0.5rem 1rem;
+ font-size: 0.9375rem;
   transition: background 0.15s;
 }
 .btn-primary:hover {
-  background: var(--text-secondary);
+ background: var(--text-secondary);
+}
+.btn-primary:focus-visible {
+ outline: 2px solid var(--text-secondary);
+ outline-offset: 2px;
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -116,12 +121,16 @@ body {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-primary);
   transition: background 0.15s;
 }
 .btn-ghost:hover {
   background: var(--surface-2);
+}
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
 }
 
 .mono {
@@ -129,8 +138,8 @@ body {
 }
 
 .label-sm {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;   /* 12px — technical label size */
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }

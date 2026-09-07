@@ -33,10 +33,10 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Settings
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Stored locally on this workstation.
         </p>
       </div>
@@ -44,7 +44,7 @@ export default function SettingsPage() {
       <div className="card p-5">
         <div className="space-y-5">
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-text-muted">
+            <label className="mono text-xs uppercase tracking-wider text-text-muted">
               API base url
             </label>
             <input
@@ -55,7 +55,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-text-muted">
+            <label className="mono text-xs uppercase tracking-wider text-text-muted">
               Watch poll interval (seconds)
             </label>
             <input
@@ -66,7 +66,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-text-muted">
+            <label className="mono text-xs uppercase tracking-wider text-text-muted">
               Enabled chains
             </label>
             <div className="mt-2 flex gap-2">
@@ -98,10 +98,10 @@ export default function SettingsPage() {
       </div>
 
       <div className="rounded-sm border border-dashed border-border p-5">
-        <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+        <div className="mono text-xs uppercase tracking-wider text-text-muted">
           cli access
         </div>
-        <pre className="mono mt-2 text-xs text-text-secondary">
+        <pre className="mono mt-2 text-[13px] text-text-secondary">
 {`bun cli/tracechain.js trace <address>
 TRACECHAIN_URL=${apiBase || "http://localhost:3000"} bun cli/tracechain.js trace <address> --json`}
         </pre>

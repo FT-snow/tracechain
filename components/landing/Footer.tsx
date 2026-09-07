@@ -19,33 +19,33 @@ export default function Footer() {
           </div>
 
           <div>
-            <div className="mono mb-4 text-[10px] uppercase tracking-[0.18em] text-text-muted">Product</div>
+            <div className="mono mb-4 text-xs uppercase tracking-[0.18em] text-text-muted">Product</div>
             <ul className="space-y-2.5">
               {productLinks.map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-sm text-text-secondary transition-colors hover:text-text-primary">{l}</a>
+                  <a href="#" className="text-[15px] text-text-secondary transition-colors hover:text-text-primary">{l}</a>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <div className="mono mb-4 text-[10px] uppercase tracking-[0.18em] text-text-muted">Resources</div>
+            <div className="mono mb-4 text-xs uppercase tracking-[0.18em] text-text-muted">Resources</div>
             <ul className="space-y-2.5">
               {resourcesLinks.map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-sm text-text-secondary transition-colors hover:text-text-primary">{l}</a>
+                  <a href="#" className="text-[15px] text-text-secondary transition-colors hover:text-text-primary">{l}</a>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <div className="mono mb-4 text-[10px] uppercase tracking-[0.18em] text-text-muted">Company</div>
+            <div className="mono mb-4 text-xs uppercase tracking-[0.18em] text-text-muted">Company</div>
             <ul className="space-y-2.5">
               {companyLinks.map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-sm text-text-secondary transition-colors hover:text-text-primary">{l}</a>
+                  <a href="#" className="text-[15px] text-text-secondary transition-colors hover:text-text-primary">{l}</a>
                 </li>
               ))}
             </ul>
@@ -53,10 +53,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
-          <p className="mono text-[11px] text-text-muted">
+          <p className="mono text-xs text-text-muted">
             © {new Date().getFullYear()} TraceChain · For law-enforcement use
           </p>
-          <p className="mono text-[11px] text-text-muted">
+          <p className="mono text-xs text-text-muted">
             BTC · ETH · BSC · USDT-TRC20
           </p>
         </div>

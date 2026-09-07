@@ -11,10 +11,10 @@ export default function HeatmapPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Heat Map
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Complaint volume by district. Total active: {total}.
         </p>
       </div>
@@ -26,14 +26,14 @@ export default function HeatmapPage() {
             <div key={d.district} className="bg-bg p-5">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <span className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                  <span className="mono text-xs uppercase tracking-wider text-text-muted">
                     {d.state}
                   </span>
                   <div className="text-sm font-semibold text-text-primary">
                     {d.district}
                   </div>
                 </div>
-                <div className="mono text-xl font-bold text-text-primary">
+                <div className="mono text-2xl font-bold text-text-primary">
                   {d.count}
                 </div>
               </div>
@@ -46,7 +46,7 @@ export default function HeatmapPage() {
                   }}
                 />
               </div>
-              <div className="mono mt-2 text-[10px] text-text-muted">
+              <div className="mono mt-2 text-[13px] text-text-muted">
                 rank {i + 1} · {Math.round((d.count / total) * 100)}% of total
               </div>
             </div>

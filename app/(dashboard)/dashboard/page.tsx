@@ -2,14 +2,15 @@
 
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
+import CountUp from "@/components/ui/CountUp";
 import { demoAlerts } from "@/lib/data";
 import { timeAgo } from "@/lib/utils";
 
-const stats = [
-  { label: "Active Traces", value: "12" },
-  { label: "Exchanges Found", value: "8" },
-  { label: "Alerts Today", value: "3" },
-  { label: "Avg Trace Time", value: "47s" },
+const stats: { label: string; to: number; suffix?: string }[] = [
+  { label: "Active Traces", to: 12 },
+  { label: "Exchanges Found", to: 8 },
+  { label: "Alerts Today", to: 3 },
+  { label: "Avg Trace Time", to: 47, suffix: "s" },
 ];
 
 const container: Variants = {
@@ -26,10 +27,10 @@ export default function DashboardHome() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Dashboard
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           TraceChain system overview
         </p>
       </div>
@@ -47,10 +48,19 @@ export default function DashboardHome() {
             variants={item}
             className="card p-5"
           >
-            <div className="mono text-3xl font-bold text-text-primary">
-              {s.value}
+            <div className="text-4xl font-bold tabular-nums text-[#896ABD]">
+              <span className="sr-only">
+                {s.to}
+                {s.suffix === "s" ? " seconds" : ""} {s.label.toLowerCase()}
+              </span>
+              <span aria-hidden="true">
+                <CountUp to={s.to} suffix={s.suffix} duration={1} />
+              </span>
             </div>
-            <div className="mono mt-1 text-[10px] uppercase tracking-[0.16em] text-text-muted">
+            <div
+              className="mono mt-1 text-xs uppercase tracking-[0.16em] text-text-muted"
+              aria-hidden="true"
+            >
               {s.label}
             </div>
           </motion.div>
@@ -61,8 +71,8 @@ export default function DashboardHome() {
         {/* Recent Alerts */}
         <div className="card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
-            <h3 className="text-sm font-semibold text-text-primary">Recent Alerts</h3>
-            <Link href="/watch" className="mono text-[10px] uppercase tracking-wider text-text-secondary hover:text-text-primary">
+            <h3 className="text-lg font-semibold text-text-primary">Recent Alerts</h3>
+            <Link href="/watch" className="mono text-xs uppercase tracking-wider text-text-secondary hover:text-text-primary">
               View all
             </Link>
           </div>
@@ -80,7 +90,7 @@ export default function DashboardHome() {
                 />
                 <div className="flex-1">
                   <div className="text-sm text-text-primary">{a.message}</div>
-                  <div className="mono mt-0.5 text-[10px] text-text-muted">
+                  <div className="mono mt-0.5 text-[13px] text-text-muted">
                     {timeAgo(a.time)}
                   </div>
                 </div>
@@ -91,7 +101,7 @@ export default function DashboardHome() {
 
         {/* Quick Trace */}
         <div className="card p-5">
-          <h3 className="mb-4 text-sm font-semibold text-text-primary">Quick Trace</h3>
+          <h3 className="mb-4 text-lg font-semibold text-text-primary">Quick Trace</h3>
           <p className="mb-5 text-sm text-text-secondary">
             Paste a wallet address to begin an immediate trace.
           </p>

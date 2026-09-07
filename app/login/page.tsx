@@ -43,10 +43,10 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-sm"
       >
-        <h1 className="text-5xl font-bold leading-none tracking-tight text-text-primary">
+        <h1 className="text-[32px] font-bold leading-tight tracking-tight text-text-primary">
           TraceChain
         </h1>
-        <p className="mt-3 text-sm text-text-secondary">
+        <p className="mt-3 text-base text-text-secondary">
           {mode === "signIn"
             ? "Officer access. Sign in to continue."
             : "Create an officer account."}
@@ -54,7 +54,7 @@ export default function LoginPage() {
 
         <form onSubmit={submit} className="mt-8 space-y-4">
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-text-muted">
+            <label className="mono text-xs uppercase tracking-wider text-text-muted">
               Email
             </label>
             <input
@@ -67,7 +67,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-text-muted">
+            <label className="mono text-xs uppercase tracking-wider text-text-muted">
               Password
             </label>
             <input

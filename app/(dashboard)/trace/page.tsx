@@ -100,14 +100,14 @@ export default function TracePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Trace Wallet
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Submit a suspect wallet address. Get a real-time trace in seconds.
         </p>
         {source && (
-          <span className="mono mt-2 inline-block text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          <span className="mono mt-2 inline-block text-xs uppercase tracking-[0.16em] text-text-muted">
             source: {source}
             {source === "live" ? " · blockchain apis" : " · sandbox engine"}
           </span>
@@ -191,23 +191,23 @@ export default function TracePage() {
                     <div className="mono text-lg font-bold text-text-primary">
                       {trace.hops.length}
                     </div>
-                    <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                    <div className="mono text-xs uppercase tracking-wider text-text-muted">
                       hops
                     </div>
                   </div>
                   <div>
-                    <div className="mono text-lg font-bold text-risk-hi">
+                    <div className="mono text-2xl font-bold text-risk-hi">
                       {trace.riskBreakdown.mixerContact ? "YES" : "NO"}
                     </div>
-                    <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                    <div className="mono text-xs uppercase tracking-wider text-text-muted">
                       mixer contact
                     </div>
                   </div>
                   <div>
-                    <div className="mono text-lg font-bold text-risk-low">
+                    <div className="mono text-2xl font-bold text-risk-low">
                       {trace.exchangeMatch?.confidence ?? 0}%
                     </div>
-                    <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                    <div className="mono text-xs uppercase tracking-wider text-text-muted">
                       exchange confidence
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export default function TracePage() {
                     <div className="text-sm font-semibold text-risk-hi">
                       Exchange Detected — {trace.exchangeMatch.name}
                     </div>
-                    <div className="mono mt-1 text-xs text-text-secondary">
+                    <div className="mono mt-1 text-[13px] text-text-secondary">
                       Deposit: {shortenAddress(trace.exchangeMatch.depositAddress, 8, 6)}{" "}
                       · Confidence: {trace.exchangeMatch.confidence}%
                       {trace.exchangeMatch.accountHint && (
@@ -242,7 +242,7 @@ export default function TracePage() {
 
             {/* Hop Timeline */}
             <div className="card p-5">
-              <h3 className="mb-4 text-sm font-semibold text-text-primary">
+              <h3 className="mb-4 text-lg font-semibold text-text-primary">
                 Transaction Timeline
               </h3>
               <div className="space-y-0">
@@ -260,7 +260,7 @@ export default function TracePage() {
 
             {/* Risk Breakdown */}
             <div className="card p-5">
-              <h3 className="mb-4 text-sm font-semibold text-text-primary">
+              <h3 className="mb-4 text-lg font-semibold text-text-primary">
                 Explainability Panel
               </h3>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -293,7 +293,7 @@ export default function TracePage() {
                   const pct = (item.value / item.max) * 100;
                   return (
                     <div key={item.label}>
-                      <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                      <div className="mono text-xs uppercase tracking-wider text-text-muted">
                         {item.label}
                       </div>
                       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
@@ -305,7 +305,7 @@ export default function TracePage() {
                           }}
                         />
                       </div>
-                      <div className="mono mt-1.5 text-xs font-medium text-text-secondary">
+                      <div className="mono mt-1.5 text-[13px] font-medium text-text-secondary">
                         {item.value} / {item.max}{" "}
                         <span className="text-text-muted">(+{item.weight}pts)</span>
                       </div>
@@ -338,7 +338,7 @@ export default function TracePage() {
           <p className="text-sm text-text-secondary">
             Paste a wallet address above to begin tracing
           </p>
-          <p className="mono mt-1 text-[10px] uppercase tracking-[0.18em] text-text-muted">
+          <p className="mono mt-1 text-xs uppercase tracking-[0.18em] text-text-muted">
             btc · eth · bsc · usdt-trc20
           </p>
         </div>
@@ -364,7 +364,7 @@ function HopCard({ hop, isFirst }: { hop: Hop; isFirst: boolean }) {
             Hop {hop.hopNumber}
           </span>
           <span
-            className="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase"
+            className="rounded px-1.5 py-0.5 text-xs font-semibold uppercase"
             style={{ color: "#000", background: color }}
           >
             {hop.type}
@@ -373,11 +373,11 @@ function HopCard({ hop, isFirst }: { hop: Hop; isFirst: boolean }) {
             <span className="text-xs text-text-muted">{hop.label}</span>
           )}
         </div>
-        <div className="mono mt-1 text-xs text-text-secondary">
+        <div className="mono mt-1 text-[13px] text-text-secondary">
           {shortenAddress(hop.from)} → {shortenAddress(hop.to)} ·{" "}
           {hop.amount} {hop.chain.toUpperCase()}
         </div>
-        <div className="mono mt-0.5 text-[10px] text-text-muted">
+        <div className="mono mt-0.5 text-[13px] text-text-muted">
           tx: {shortenAddress(hop.txHash, 10, 6)}
         </div>
       </div>

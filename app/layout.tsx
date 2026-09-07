@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+
+const lastik = localFont({
+  src: [{ path: "../public/fonts/LastikFree.woff2", weight: "400", style: "normal" }],
+  variable: "--font-display",
+  display: "swap",
+});
 
 const geistMono = Geist_Mono({
   variable: "--font-technical",
@@ -27,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistMono.variable} h-full antialiased`}    >
+      className={`${lastik.variable} ${geistMono.variable} h-full antialiased`}    >
       <body className="min-h-screen bg-bg text-text-primary">
         <Providers>{children}</Providers>
       </body>

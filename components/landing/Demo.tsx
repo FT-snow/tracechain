@@ -77,7 +77,7 @@ export default function Demo() {
         >
           <div className="overflow-hidden rounded border border-border bg-surface">
             <div className="border-b border-border bg-surface-2 px-4 py-2.5">
-              <span className="mono text-[10px] uppercase tracking-[0.15em] text-text-muted">
+              <span className="mono text-xs uppercase tracking-[0.15em] text-text-muted">
                 live trace · {shortenAddress(demo.victimAddress)}
               </span>
             </div>
@@ -109,7 +109,7 @@ export default function Demo() {
 function AnimatePresenceLabel({ show }: { show: boolean }) {
   if (!show) return null;
   return (
-    <div className="mono absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[11px] uppercase tracking-[0.25em] text-text-muted">
+    <div className="mono absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs uppercase tracking-[0.25em] text-text-muted">
       tracing…
     </div>
   );

@@ -6,10 +6,10 @@ export default function CorrelationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className="text-[32px] leading-tight font-bold tracking-tight text-text-primary">
           Correlations
         </h1>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-base text-text-secondary">
           Separate cases converging on shared deposit wallets expose the same
           operator.
         </p>
@@ -25,7 +25,7 @@ export default function CorrelationsPage() {
                     cluster {c.id}
                   </span>
                   <span
-                    className="mono rounded px-1.5 py-0.5 text-[10px] font-bold uppercase"
+                    className="mono rounded px-1.5 py-0.5 text-xs font-bold uppercase"
                     style={{
                       color: c.strength > 80 ? "#000" : "var(--text-primary)",
                       background:
@@ -36,17 +36,17 @@ export default function CorrelationsPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-text-primary">{c.note}</p>
-                <div className="mono mt-3 space-y-1 text-xs text-text-secondary">
+                <div className="mono mt-3 space-y-1 text-[13px] text-text-secondary">
                   {c.walletCluster.map((w) => (
                     <div key={w}>{w}</div>
                   ))}
                 </div>
               </div>
               <div className="text-right">
-                <div className="mono text-[10px] uppercase tracking-wider text-text-muted">
+                <div className="mono text-xs uppercase tracking-wider text-text-muted">
                   linked cases
                 </div>
-                <div className="mono mt-1 space-y-0.5 text-xs text-text-secondary">
+                <div className="mono mt-1 space-y-0.5 text-[13px] text-text-secondary">
                   {c.caseIds.map((id) => (
                     <div key={id}>{id}</div>
                   ))}

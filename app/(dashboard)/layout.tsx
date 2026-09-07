@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { motion, useReducedMotion, Variants } from "framer-motion";
 import { useConvexAuth, useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
+import NavMenu from "@/components/ui/NavMenu";
 
 const sidebarIn: Variants = {
   hidden: { opacity: 0, x: -16 },
@@ -50,59 +51,60 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
     if (!isLoading && !isAuthenticated) router.replace("/login");
   }, [isLoading, isAuthenticated, router]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center bg-bg">
-        <span className="mono text-sm text-text-muted">
-          {isLoading ? "checking session…" : "redirecting to sign in"}
+      <div className="flex h-dvh items-center justify-center bg-bg">
+        <span role="status" className="mono text-sm text-text-secondary">
+          {isLoading ? "checking session…" : "redirecting to sign in…"}
         </span>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-bg">
+    <div className="flex h-dvh bg-bg">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:bg-[#17111F] focus:px-3 focus:py-2 focus:text-[15px] focus:text-[#EDEAF6]"
+      >
+        Skip to content
+      </a>
       {/* Sidebar */}
       <motion.aside
         {...anim}
         variants={sidebarIn}
         className={cn(
-          "hidden flex-col border-r border-border bg-surface transition-all duration-300 md:flex",
+          "hidden flex-col border-r border-border bg-surface transition-[width] duration-300 md:flex",
           collapsed ? "w-16" : "w-60"
         )}
       >
         <div className="flex h-14 items-center justify-between border-b border-border px-4">
           {!collapsed && (
-            <Link href="/dashboard" className="text-sm font-bold text-text-primary">
+            <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
               TraceChain
             </Link>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex h-8 w-8 items-center justify-center rounded text-text-muted hover:text-text-primary"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
           >
-            <Menu className="h-4 w-4" />
+            <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
-        <nav className="flex-1 space-y-1 px-2 py-3">
-          {nav.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors",
-                  active
-                    ? "bg-surface-3 text-text-primary"
-                    : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
-                )}
-              >
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex-1 px-2 py-3">
+          <NavMenu collapsed={collapsed} />
+        </div>
       </motion.aside>
 
       {/* Mobile sidebar */}
@@ -110,18 +112,29 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div
             className="absolute inset-0 bg-black/60"
+            aria-hidden="true"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative z-10 w-60 border-r border-border bg-surface">
+          <div
+            id="mobile-nav"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            className="relative z-10 w-60 overscroll-contain border-r border-border bg-surface"
+          >
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <Link href="/dashboard" className="text-sm font-bold text-text-primary">
+              <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
                 TraceChain
               </Link>
-              <button onClick={() => setMobileOpen(false)}>
-                <X className="h-4 w-4 text-text-muted" />
+              <button
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close navigation"
+                className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
-            <nav className="space-y-1 px-2 py-3">
+            <nav aria-label="Mobile navigation" className="space-y-1 px-2 py-3">
               {nav.map((item) => {
                 const active = pathname === item.href;
                 return (
@@ -129,8 +142,9 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors",
+                      "flex items-center gap-3 rounded-sm px-3 py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]",
                       active
                         ? "bg-surface-3 text-text-primary"
                         : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
@@ -154,21 +168,25 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
         >
           <button
             onClick={() => setMobileOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded border border-border text-text-secondary md:hidden"
+            aria-label="Open navigation"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+            className="flex h-9 w-9 items-center justify-center rounded border border-border text-text-secondary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD] md:hidden"
           >
-            <Menu className="h-4 w-4" />
+            <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
-          <span className="mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          <span className="mono text-xs uppercase tracking-[0.16em] text-text-secondary">
             system operational
           </span>
           <button
             onClick={() => signOut()}
-            className="mono text-xs text-text-muted transition-colors hover:text-text-primary"
+            className="mono text-xs text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
           >
             sign out
           </button>
         </motion.header>
         <motion.main
+          id="main-content"
           {...anim}
           variants={contentIn}
           className="flex-1 overflow-auto p-4 md:p-6"
