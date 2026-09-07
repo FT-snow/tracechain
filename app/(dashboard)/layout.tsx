@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -28,7 +28,6 @@ const nav = [
   { label: "NFTs", href: "/nft" },
   { label: "Live Watch", href: "/watch" },
   { label: "Reports", href: "/reports" },
-  { label: "Correlations", href: "/correlations" },
   { label: "Heat Map", href: "/heatmap" },
   { label: "Provenance", href: "/provenance" },
   { label: "Terminal", href: "/terminal" },
@@ -48,6 +47,31 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
     initial: "hidden",
     animate: "visible",
   } as const;
+
+  // hover-open rail: no click needed — pointer enters the collapsed bar,
+  // it expands; leaving collapses it back after a short delay
+  const hoverOpenTimer = useRef<number | null>(null);
+
+  const expandOnHover = useCallback(() => {
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    if (hoverOpenTimer.current) {
+      window.clearTimeout(hoverOpenTimer.current);
+      hoverOpenTimer.current = null;
+    }
+    if (collapsed) {
+      hoverOpenTimer.current = window.setTimeout(() => setCollapsed(false), 220);
+    }
+  }, [collapsed]);
+
+  const collapseOnLeave = useCallback(() => {
+    if (hoverOpenTimer.current) {
+      window.clearTimeout(hoverOpenTimer.current);
+      hoverOpenTimer.current = null;
+    }
+    if (!collapsed) {
+      hoverOpenTimer.current = window.setTimeout(() => setCollapsed(true), 450);
+    }
+  }, [collapsed]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/login");
@@ -69,6 +93,8 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
       <motion.aside
         {...anim}
         variants={sidebarIn}
+        onMouseEnter={expandOnHover}
+        onMouseLeave={collapseOnLeave}
         className={cn(
           "hidden flex-col border-r border-border bg-surface transition-all duration-300 md:flex",
           collapsed ? "w-16" : "w-60"

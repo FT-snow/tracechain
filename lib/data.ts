@@ -130,15 +130,22 @@ export const demoAlerts = [
   { id: "al_3", type: "new_flag", message: "3 new victims flagged 0x7a25…488D", time: now - 4700 * 1000, severity: "med" },
 ];
 
-export const demoHeatmap = [
-  { state: "DL", district: "Delhi", count: 42 },
-  { state: "HR", district: "Gurugram", count: 36 },
-  { state: "MH", district: "Mumbai", count: 51 },
-  { state: "KA", district: "Bengaluru", count: 33 },
-  { state: "TN", district: "Chennai", count: 27 },
-  { state: "UP", district: "Lucknow", count: 24 },
-  { state: "GJ", district: "Ahmedabad", count: 19 },
-  { state: "WB", district: "Kolkata", count: 22 },
-  { state: "RJ", district: "Jaipur", count: 15 },
-  { state: "MP", district: "Bhopal", count: 12 },
+export type Severity = "danger" | "normal" | "safe";
+
+export const demoHeatmap: {
+  state: string;
+  district: string;
+  count: number;
+  severity: Severity;
+}[] = [
+  { state: "DL", district: "Delhi", count: 42, severity: "danger" },
+  { state: "HR", district: "Gurugram", count: 36, severity: "normal" },
+  { state: "MH", district: "Mumbai", count: 51, severity: "danger" },
+  { state: "KA", district: "Bengaluru", count: 33, severity: "normal" },
+  { state: "TN", district: "Chennai", count: 27, severity: "normal" },
+  { state: "UP", district: "Lucknow", count: 24, severity: "normal" },
+  { state: "GJ", district: "Ahmedabad", count: 19, severity: "safe" },
+  { state: "WB", district: "Kolkata", count: 22, severity: "normal" },
+  { state: "RJ", district: "Jaipur", count: 15, severity: "safe" },
+  { state: "MP", district: "Bhopal", count: 12, severity: "safe" },
 ];

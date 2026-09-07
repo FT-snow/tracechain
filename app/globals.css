@@ -29,6 +29,10 @@
   --risk-hi: #ff3b3b;
   --risk-med: #ff9500;
   --risk-low: #00d68f;
+  /* severity tokens used by the severity-driven charts (functional data colors) */
+  --danger: var(--risk-hi);
+  --normal: var(--risk-med);
+  --safe: var(--risk-low);
 }
 
 @theme inline {
@@ -44,8 +48,10 @@
   --color-risk-hi: var(--risk-hi);
   --color-risk-med: var(--risk-med);
   --color-risk-low: var(--risk-low);
-  --font-sans: "Norse", sans-serif;
+  --font-sans: var(--font-display), sans-serif;
   --font-mono: var(--font-technical);
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: calc(1.375rem / 0.9375rem);
 }
 
 * {
@@ -55,8 +61,13 @@
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: "Norse", sans-serif;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
   -webkit-font-smoothing: antialiased;
+}
+
+button, a, input, textarea, select {
+  touch-action: manipulation;
 }
 
 ::-webkit-scrollbar {
