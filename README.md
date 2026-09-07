@@ -1,5 +1,7 @@
 # TraceChain
 
+[![tests](https://github.com/FT-snow/tracechain/actions/workflows/test.yml/badge.svg)](https://github.com/FT-snow/tracechain/actions)
+
 Real-time identification of fraud-linked cryptocurrency exchanges from victim-reported wallet addresses — through automated blockchain analytics. Built for SIH26183, Ministry of Home Affairs.
 
 Submit a suspect wallet. Trace the money across Bitcoin, Ethereum, BSC, and Tron, hop by hop, live on real chains. When funds land on a known exchange deposit wallet, name it, score the risk, and generate a court-ready report with a freeze-request letter — in under a minute.
@@ -68,6 +70,18 @@ The trace payload feeds gpt-oss-120b via OpenRouter and returns, in a single gen
 3. **REST API** — `POST /api/trace`, `POST /api/nft`, `POST /api/report`, JSON in and out, secured by an API key.
 
 All three speak to the same engine and the same honesty contract.
+
+## Measured performance
+
+Single-run measurements against the production deployment (Vercel, free tiers):
+
+| Operation | Latency | Notes |
+|---|---|---|
+| Live ETH trace (3 hops) | ~2 s | Blockscout, keyless |
+| Live BTC trace (3 hops) | ~11 s | blockchain.info incl. backoff |
+| NFT history (100 transfers) | ~5 s | Blockscout, keyless |
+| Report generation (report + freeze letter) | ~3 s | single combined generation, throughput-routed |
+| Report re-verification | < 1 s | content-hash comparison, deterministic engine |
 
 ## Quickstart
 

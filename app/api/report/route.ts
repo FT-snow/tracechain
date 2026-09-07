@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { checkApiKey } from "@/lib/auth";
+import { EXCHANGE_LABELS } from "@/lib/chain/exchange-labels/dataset";
+
+const DATASET_VERSION = 1;
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const API_KEY = process.env.OPENROUTER_API_KEY ?? "";
@@ -78,8 +81,9 @@ export async function POST(req: Request) {
   if (!checkApiKey(req)) {
     return NextResponse.json({ error: "API key required — server has TRACECHAIN_API_KEY set but request sent no matching x-api-key header" }, { status: 401 });
   }
-  try {
+    try {
     const raw = await req.json();
+    const prevHash: string = typeof raw?.prevHash === "string" ? raw.prevHash : "";
     const input: TraceInput = {
       victimAddress: raw?.victimAddress ?? "unknown",
       hops: Array.isArray(raw?.hops) ? raw.hops : [],
@@ -132,7 +136,35 @@ Keep the whole output tight — no filler, no repetition. Format as clean markdo
 
     const combined = await callLLM(reportPrompt);
 
-    const sha256Input = JSON.stringify({ ...input, reportMd: combined, generatedAt: new Date().toISOString() });
+    const LIMITATIONS =
+      "\n\n---\n\n## Limitations & Method\n\n" +
+      "- Live traces query public ledgers only; on-chain data shows fund flow, never personal identity. Attribution requires exchange KYC records obtained by legal process.\n" +
+      "- Mixer interactions are detected and scored as a risk signal; on-chain deanonymization inside universal mixers is not claimed.\n" +
+      "- Cross-chain bridge linking is a roadmap capability; current traces are per-chain with bridge interactions marked.\n" +
+      "- Exchange matching is exact-address against a published, versioned dataset. `" +
+      "dataset_version=" + DATASET_VERSION + "`.\n" +
+      "- This document is machine-generated from verifiable ledger facts and requires certification by the investigating officer under the Bharatiya Sakshya Adhiniyam, 2023.\n";
+
+    const reportMd = combined + LIMITATIONS;
+
+    const datasetJson = JSON.stringify(EXCHANGE_LABELS);
+    const dsBuf = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(datasetJson)
+    );
+    const datasetSha = Array.from(new Uint8Array(dsBuf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, 16);
+
+    const sha256Input = JSON.stringify({
+      victimAddress: input.victimAddress,
+      hops: input.hops,
+      riskScore: input.riskScore,
+      reportMd,
+      prevHash,
+      generatedAt: null, // excluded from content binding so re-verify can reproduce content hash
+    });
     const hashBuffer = await crypto.subtle.digest(
       "SHA-256",
       new TextEncoder().encode(sha256Input)
@@ -142,9 +174,13 @@ Keep the whole output tight — no filler, no repetition. Format as clean markdo
       .join("");
 
     return NextResponse.json({
-      report: combined,
+      report: reportMd,
       freezeLetter: "",
       sha256Hash,
+      prevHash,
+      contentHash: sha256Hash,
+      datasetVersion: DATASET_VERSION,
+      datasetSha,
       generatedAt: new Date().toISOString(),
     });
   } catch (err: unknown) {

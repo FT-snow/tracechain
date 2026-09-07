@@ -30,6 +30,7 @@ const nav = [
   { label: "Reports", href: "/reports" },
   { label: "Correlations", href: "/correlations" },
   { label: "Heat Map", href: "/heatmap" },
+  { label: "Provenance", href: "/provenance" },
   { label: "Terminal", href: "/terminal" },
   { label: "Settings", href: "/settings" },
 ];
