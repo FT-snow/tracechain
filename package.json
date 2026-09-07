@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cli": "bun cli/tracechain.js"
   },
   "dependencies": {
     "@convex-dev/auth": "^0.0.95",

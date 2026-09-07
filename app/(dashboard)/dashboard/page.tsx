@@ -3,6 +3,8 @@
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import CountUp from "@/components/ui/CountUp";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { demoAlerts } from "@/lib/data";
 import { timeAgo } from "@/lib/utils";
 
@@ -24,6 +26,14 @@ const item: Variants = {
 };
 
 export default function DashboardHome() {
+  const router = useRouter();
+  const [quick, setQuick] = useState("");
+
+  const goTrace = () => {
+    const a = quick.trim();
+    if (a) router.push(`/trace?address=${encodeURIComponent(a)}`);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -108,12 +118,15 @@ export default function DashboardHome() {
           <div className="flex gap-3">
             <input
               type="text"
+              value={quick}
+              onChange={(e) => setQuick(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && goTrace()}
               placeholder="0x…"
               className="input flex-1 font-mono text-sm"
             />
-            <Link href="/trace" className="btn-primary text-sm">
+            <button onClick={goTrace} className="btn-primary text-sm">
               Go
-            </Link>
+            </button>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-3">
             {["BTC", "ETH", "BSC", "TRX"].map((chain) => (

@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { TraceResult, Hop } from "@/lib/data";
 import { shortenAddress, riskColor, riskLabel } from "@/lib/utils";
 
 export default function TracePage() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const autoRan = useRef(false);
   const [input, setInput] = useState("");
   const [tracing, setTracing] = useState(false);
   const [trace, setTrace] = useState<TraceResult | null>(null);
@@ -15,8 +19,8 @@ export default function TracePage() {
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
 
-  const startTrace = async () => {
-    const targetAddr = input.trim();
+  const startTrace = async (override?: string) => {
+    const targetAddr = (override ?? input).trim();
     if (!targetAddr) return;
     setTracing(true);
     setTrace(null);
@@ -96,6 +100,16 @@ export default function TracePage() {
     return () => clearTimeout(t);
   }, [copied]);
 
+  useEffect(() => {
+    const q = params.get("address");
+    if (q && !autoRan.current) {
+      autoRan.current = true;
+      setInput(q);
+      startTrace(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -127,7 +141,7 @@ export default function TracePage() {
           />
         </div>
         <button
-          onClick={startTrace}
+          onClick={() => startTrace()}
           disabled={tracing}
           className="btn-primary flex items-center gap-2"
         >
@@ -317,8 +331,20 @@ export default function TracePage() {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-3">
-              <button className="btn-primary">Generate Report</button>
-              <button className="btn-ghost">Enable Live Watch</button>
+              <button
+                onClick={() =>
+                  router.push(`/reports?address=${encodeURIComponent(trace.victimAddress)}`)
+                }
+                className="btn-primary"
+              >
+                Generate Report
+              </button>
+              <button
+                onClick={() => router.push(`/watch?address=${encodeURIComponent(trace.victimAddress)}`)}
+                className="btn-ghost"
+              >
+                Enable Live Watch
+              </button>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(trace.victimAddress);

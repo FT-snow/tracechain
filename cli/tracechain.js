@@ -5,10 +5,13 @@ const USAGE = `tracechain — wallet tracing CLI
 
 usage:
   tracechain trace <wallet-address> [--chain BTC|ETH|BSC|TRX] [--json]
+  tracechain nft <eth-address> [--json]
+  tracechain report <wallet-address>       trace + court-ready report
   tracechain help
 
 env:
-  TRACECHAIN_URL   API base url (default http://localhost:3000)`;
+  TRACECHAIN_URL   API base url (default http://localhost:3000)
+  TRACECHAIN_API_KEY  API key (sent as x-api-key header)`;
 
 async function trace(args) {
   const address = args.find((a) => !a.startsWith("--"));
@@ -71,9 +74,131 @@ async function trace(args) {
   console.log(`${data.hops.length} hops traced. Court-ready report: POST ${BASE}/api/report`);
 }
 
+async function nft(args) {
+  const address = args.find((a) => !a.startsWith("--"));
+  if (!address) {
+    console.error("error: missing address\n");
+    console.log(USAGE);
+    process.exit(1);
+  }
+  const json = args.includes("--json");
+
+  let res;
+  try {
+    res = await fetch(`${BASE}/api/nft`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.TRACECHAIN_API_KEY
+          ? { "x-api-key": process.env.TRACECHAIN_API_KEY }
+          : {}),
+      },
+      body: JSON.stringify({ address }),
+    });
+  } catch {
+    console.error(`error: cannot reach ${BASE} — is the server running?`);
+    process.exit(1);
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error(`error: ${data.error || res.status}`);
+    process.exit(1);
+  }
+  if (json) {
+    console.log(JSON.stringify(data, null, 2));
+    return;
+  }
+
+  const pad = (s, n) => String(s).padEnd(n);
+  const short = (a) => (!a ? "" : a.length > 13 ? a.slice(0, 7) + "..." + a.slice(-4) : a);
+  const time = (t) => new Date(t).toISOString().slice(0, 16).replace("T", " ");
+
+  console.log(`NFT TRANSFERS ${data.address}`);
+  console.log(
+    `received: ${data.summary.received}   sent: ${data.summary.sent}   flagged to exchange: ${data.summary.flagged}   collections: ${data.summary.collections}`
+  );
+  console.log("");
+  console.log(
+    `${pad("COLLECTION", 20)}${pad("ID", 12)}${pad("STD", 9)}${pad("FROM", 15)}${pad("TO", 15)}${pad("TIME", 18)}TX`
+  );
+  for (const t of data.transfers.slice(0, 25)) {
+    console.log(
+      `${pad(t.collection.slice(0, 19), 20)}${pad(t.tokenId.slice(0, 11), 12)}${pad(t.standard.slice(0, 8), 9)}${pad(short(t.from), 15)}${pad(short(t.to) + (t.toExchange ? "*" : ""), 15)}${pad(time(t.timestamp), 18)}${short(t.txHash)}`
+    );
+  }
+  console.log("");
+  console.log(
+    `${Math.min(25, data.transfers.length)} of ${data.transfers.length} transfers shown. Flags: TO marked when destination is a known exchange wallet.`
+  );
+}
+
+const headers = () => ({
+  "Content-Type": "application/json",
+  ...(process.env.TRACECHAIN_API_KEY
+    ? { "x-api-key": process.env.TRACECHAIN_API_KEY }
+    : {}),
+});
+
+async function report(args) {
+  const address = args.find((a) => !a.startsWith("--"));
+  if (!address) {
+    console.error("error: missing wallet address\n");
+    console.log(USAGE);
+    process.exit(1);
+  }
+
+  let res;
+  try {
+    const t = await fetch(`${BASE}/api/trace`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ address }),
+    });
+    const trace = await t.json();
+    if (!t.ok) {
+      console.error(`error (trace): ${trace.error || t.status}`);
+      process.exit(1);
+    }
+    console.error(`trace ok (${trace.source}, ${trace.hops.length} hops) — writing report…`);
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        res = await fetch(`${BASE}/api/report`, {
+          method: "POST",
+          headers: headers(),
+          body: JSON.stringify(trace),
+        });
+        lastErr = null;
+        break;
+      } catch (e) {
+        lastErr = e;
+        console.error(`report attempt ${attempt} failed — retrying…`);
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+    if (lastErr) {
+      console.error(`error: cannot reach ${BASE}/api/report after 3 attempts — ${lastErr.message}`);
+      process.exit(1);
+    }
+  } catch {
+    console.error(`error: cannot reach ${BASE} — is the server running?`);
+    process.exit(1);
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error(`error (report): ${data.error || res.status}`);
+    process.exit(1);
+  }
+  console.log(data.report ?? JSON.stringify(data, null, 2));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 
 if (cmd === "trace") await trace(args);
+else if (cmd === "nft") await nft(args);
+else if (cmd === "report") await report(args);
 else if (cmd === "help" || !cmd) console.log(USAGE);
 else {
   console.error(`unknown command: ${cmd}\n`);

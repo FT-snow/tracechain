@@ -1,20 +1,11 @@
 import { NextResponse } from "next/server";
-import { EXCHANGE_LABELS } from "@/lib/chain/exchange-labels/dataset";
 import { matchExchange } from "@/lib/chain/exchange-labels/matcher";
 import { checkApiKey } from "@/lib/auth";
+import { simulateTrace } from "@/lib/chain/sandbox";
+import type { Hop } from "@/lib/data";
 import { traceAddress, detectChain, ChainId } from "@/lib/chain/traverse";
 
 const CHAINS = ["BTC", "ETH", "BSC", "TRX"];
-
-interface Hop {
-  from: string;
-  to: string;
-  amount: number;
-  chain: string;
-  txHash: string;
-  timestamp: number;
-  hopNumber: number;
-}
 
 function seedFrom(addr: string) {
   let h = 2166136261;
@@ -57,7 +48,7 @@ function inferChain(address: string): string {
 
 export async function POST(req: Request) {
   if (!checkApiKey(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "API key required — server has TRACECHAIN_API_KEY set but request sent no matching x-api-key header" }, { status: 401 });
   }
   try {
     const body = await req.json();
@@ -111,54 +102,7 @@ export async function POST(req: Request) {
     }
 
     // ---- deterministic simulation fallback ----
-    const r = rng(seedFrom(address.toLowerCase()));
-
-    const hopCount = 2 + Math.floor(r() * 4);
-    const hops: Hop[] = [];
-    let prev = address;
-    let amount = 0.5 + r() * 9.5;
-    const now = Date.now();
-
-    for (let i = 0; i < hopCount; i++) {
-      const next = fakeAddr(r, chain);
-      const c = CHAINS[Math.floor(r() * CHAINS.length)];
-      hops.push({
-        from: prev,
-        to: next,
-        amount: Number(amount.toFixed(4)),
-        chain: c,
-        txHash: fakeHash(r),
-        timestamp: now - (hopCount - i) * (60000 + Math.floor(r() * 300000)),
-        hopNumber: i + 1,
-      });
-      prev = next;
-      amount = amount * (0.3 + r() * 0.5);
-    }
-
-    let exchangeMatch: { name: string; depositAddress: string; confidence: number } | null = null;
-    const candidates = EXCHANGE_LABELS.filter((e) => e.chain === chain);
-    if (candidates.length && r() > 0.25) {
-      const hit = candidates[Math.floor(r() * candidates.length)];
-      const direct = matchExchange(address, chain);
-      exchangeMatch = {
-        name: hit.name,
-        depositAddress: direct ? address : hit.address,
-        confidence: direct ? 0.98 : Number((0.7 + r() * 0.25).toFixed(2)),
-      };
-      const last = hops[hops.length - 1];
-      last.to = exchangeMatch.depositAddress;
-    }
-
-    const mixerContact = r() > 0.7;
-    const riskScore = Math.min(
-      99,
-      Math.round(
-        20 +
-          hops.length * 9 +
-          (exchangeMatch ? exchangeMatch.confidence * 30 : 10) +
-          (mixerContact ? 18 : 0)
-      )
-    );
+    const sim = simulateTrace(address, chain);
 
     return NextResponse.json({
       address,
@@ -166,16 +110,11 @@ export async function POST(req: Request) {
       source: "simulated",
       probes: [],
       stoppedOn: "simulated",
-      hops,
-      exchangeMatch,
-      mixerContact,
-      riskScore,
-      riskBreakdown: {
-        hopCount: hops.length,
-        mixerContact,
-        velocity: Number((0.3 + r() * 0.6).toFixed(2)),
-        exchangeConfidence: exchangeMatch?.confidence ?? 0,
-      },
+      hops: sim.hops,
+      exchangeMatch: sim.exchangeMatch,
+      mixerContact: sim.mixerContact,
+      riskScore: sim.riskScore,
+      riskBreakdown: sim.riskBreakdown,
       generatedAt: new Date().toISOString(),
     });
   } catch {

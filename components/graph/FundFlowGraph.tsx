@@ -137,10 +137,10 @@ function Edge({
     const curve = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(...from),
       new THREE.Vector3(...mid),
-      new THREE.Vector3(...to)
-    );
+      new THREE.Vector3(...to)    );
     return new THREE.TubeGeometry(curve, 48, 0.03, 6, false);
-  }, [from, to]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [from[0], from[1], from[2], to[0], to[1], to[2]]);
 
   const startTime = useRef(0);
   const progress = useRef(0);
@@ -247,16 +247,15 @@ function Scene({
     });
 
     hops.forEach((h, i) => {
-      const t = (i + 1) / (hops.length + 0.5);
+      // position depends ONLY on the hop index — fixed step per hop,
+      // so existing nodes never move when a new hop appears (no wobble)
+      const x = -9 + (i + 1) * 4.6;
+      const z = 3 - (i + 1) * 3;
       nodesArr.push({
         address: h.to,
         type: h.type,
         label: h.label,
-        pos: [
-          -9 + t * 18,
-          i % 2 === 0 ? 1.4 : -1.4,
-          3 - t * 12,
-        ],
+        pos: [x, i % 2 === 0 ? 1.4 : -1.4, z],
       });
     });
 
@@ -275,6 +274,13 @@ function Scene({
       <hemisphereLight args={["#ffffff", "#1a1a1a", 0.7]} />
       <directionalLight position={[6, 12, 8]} intensity={1.2} color="#ffffff" />
       <directionalLight position={[-8, -4, -6]} intensity={0.4} color="#888888" />
+
+      {[6, 10.5, 15, 19.5].map((r) => (
+        <mesh key={r} rotation={[Math.PI / 2, 0, 0]} position={[0, -3.4, 0]}>
+          <torusGeometry args={[r, 0.012, 6, 72]} />
+          <meshBasicMaterial color="#2a2a2a" transparent opacity={0.35} />
+        </mesh>
+      ))}
 
       {nodes.map((n, i) => (
         <Node
@@ -316,14 +322,16 @@ function Scene({
       <OrbitControls
         enablePan={false}
         autoRotate
-        autoRotateSpeed={0.45}
+        autoRotateSpeed={0.3}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.05}
+        rotateSpeed={0.6}
         minDistance={7}
-        maxDistance={30}
-        minPolarAngle={Math.PI / 3.4}
-        maxPolarAngle={Math.PI / 1.9}
+        maxDistance={26}
+        minPolarAngle={Math.PI / 2.6}
+        maxPolarAngle={Math.PI / 2.05}
         target={[0, 0, -1]}
+        makeDefault
       />
     </>
   );

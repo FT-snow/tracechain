@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { Eye, FileText, LayoutDashboard, Map, Search } from "lucide-react";
+import { Boxes, Eye, FileText, LayoutDashboard, Map, ScrollText, Search, TerminalSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SidebarHeader from "./SidebarHeader";
 import SidebarItem, { type SidebarItemData } from "./SidebarItem";
@@ -10,9 +10,12 @@ import SidebarFooter from "./SidebarFooter";
 export const NAV_ITEMS: SidebarItemData[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Investigate", href: "/trace", icon: Search },
+  { label: "NFTs", href: "/nft", icon: Boxes },
   { label: "Live Watch", href: "/watch", icon: Eye },
   { label: "Reports", href: "/reports", icon: FileText },
   { label: "Heat Map", href: "/heatmap", icon: Map },
+  { label: "Provenance", href: "/provenance", icon: ScrollText },
+  { label: "Terminal", href: "/terminal", icon: TerminalSquare },
 ];
 
 interface SidebarProps {

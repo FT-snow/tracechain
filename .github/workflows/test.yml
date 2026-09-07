@@ -1,0 +1,22 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TRACECHAIN_API_KEY: ci-test-key
+      NEXT_PUBLIC_TRACECHAIN_API_KEY: ci-test-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun test
+      - run: bunx tsc --noEmit
+      - run: bun run build
+        env:
+          NEXT_PUBLIC_CONVEX_URL: https://courteous-goshawk-398.convex.cloud
+          NEXT_PUBLIC_TRACECHAIN_API_KEY: ci-test-key
