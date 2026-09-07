@@ -61,13 +61,65 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        <div className="relative hidden h-[calc(100vh-4rem)] bg-bg lg:block">
-          <SplineScene />
+        <div className="relative hidden h-[calc(100vh-4rem)] bg-bg p-6 lg:block lg:p-8">
+          <div className="relative h-full w-full overflow-hidden rounded-sm border border-[#896ABD]/25 bg-[#17111F] shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+            <SplineScene />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(120%_100%_at_50%_50%,transparent_52%,rgba(3,3,3,0.55)_100%)]"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,transparent_78%,rgba(3,3,3,0.8)_100%)]"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute left-2 top-2 z-20 h-3 w-3 border-l-2 border-t-2 border-[#A855F7]/60"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute right-2 top-2 z-20 h-3 w-3 border-r-2 border-t-2 border-[#A855F7]/60"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-2 left-2 z-20 h-3 w-3 border-b-2 border-l-2 border-[#A855F7]/60"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-2 right-2 z-20 h-3 w-3 border-b-2 border-r-2 border-[#A855F7]/60"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="relative mx-auto h-[300px] max-w-7xl lg:hidden">
-        <SplineScene />
+      <div className="relative mx-auto h-[300px] max-w-7xl p-3 lg:hidden">
+        <div className="relative h-full w-full overflow-hidden rounded-sm border border-[#896ABD]/25 bg-[#17111F] shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+          <SplineScene />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(120%_100%_at_50%_50%,transparent_52%,rgba(3,3,3,0.55)_100%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,transparent_78%,rgba(3,3,3,0.8)_100%)]"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute left-2 top-2 z-20 h-3 w-3 border-l-2 border-t-2 border-[#A855F7]/60"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute right-2 top-2 z-20 h-3 w-3 border-r-2 border-t-2 border-[#A855F7]/60"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute bottom-2 left-2 z-20 h-3 w-3 border-b-2 border-l-2 border-[#A855F7]/60"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute bottom-2 right-2 z-20 h-3 w-3 border-b-2 border-r-2 border-[#A855F7]/60"
+          />
+        </div>
       </div>
     </section>
   );

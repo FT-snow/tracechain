@@ -1,18 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { motion, useReducedMotion, Variants } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, Variants } from "framer-motion";
 import { useConvexAuth, useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
-import NavMenu from "@/components/ui/NavMenu";
+import Sidebar, { NAV_ITEMS } from "@/components/sidebar/Sidebar";
 
-const sidebarIn: Variants = {
-  hidden: { opacity: 0, x: -16 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
-};
 const headerIn: Variants = {
   hidden: { opacity: 0, y: -10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
@@ -22,16 +18,7 @@ const contentIn: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 } },
 };
 
-const nav = [
-  { label: "Home", href: "/" },
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Trace Wallet", href: "/trace" },
-  { label: "Live Watch", href: "/watch" },
-  { label: "Reports", href: "/reports" },
-  { label: "Correlations", href: "/correlations" },
-  { label: "Heat Map", href: "/heatmap" },
-  { label: "Settings", href: "/settings" },
-];
+const MOBILE_NAV = [{ label: "Home", href: "/" }, ...NAV_ITEMS];
 
 export default function DashLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -42,6 +29,8 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const handleToggleSidebar = useCallback(() => setCollapsed((c) => !c), []);
+
   const anim = reduceMotion ? {} : {
     initial: "hidden",
     animate: "visible",
@@ -50,6 +39,16 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/login");
   }, [isLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px) and (max-width: 1023px)");
+    const sync = () => {
+      if (mq.matches) setCollapsed(true);
+    };
+    mq.addEventListener("change", sync);
+    sync();
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -79,85 +78,70 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
         Skip to content
       </a>
       {/* Sidebar */}
-      <motion.aside
-        {...anim}
-        variants={sidebarIn}
-        className={cn(
-          "hidden flex-col border-r border-border bg-surface transition-[width] duration-300 md:flex",
-          collapsed ? "w-16" : "w-60"
-        )}
-      >
-        <div className="flex h-14 items-center justify-between border-b border-border px-4">
-          {!collapsed && (
-            <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
-              TraceChain
-            </Link>
-          )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-expanded={!collapsed}
-            className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
-          >
-            <Menu className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="flex-1 px-2 py-3">
-          <NavMenu collapsed={collapsed} />
-        </div>
-      </motion.aside>
+      <Sidebar collapsed={collapsed} onToggle={handleToggleSidebar} />
 
       {/* Mobile sidebar */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
-          <div
-            className="absolute inset-0 bg-black/60"
-            aria-hidden="true"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div
-            id="mobile-nav"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation"
-            className="relative z-10 w-60 overscroll-contain border-r border-border bg-surface"
-          >
-            <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
-                TraceChain
-              </Link>
-              <button
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close navigation"
-                className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-            <nav aria-label="Mobile navigation" className="space-y-1 px-2 py-3">
-              {nav.map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex items-center gap-3 rounded-sm px-3 py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]",
-                      active
-                        ? "bg-surface-3 text-text-primary"
-                        : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
-                    )}
-                  >
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+      <AnimatePresence initial={false}>
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 flex md:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+              className="absolute inset-0 bg-black/60"
+              aria-hidden="true"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.div
+              id="mobile-nav"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation"
+              initial={reduceMotion ? { opacity: 0 } : { x: "-100%" }}
+              animate={reduceMotion ? { opacity: 1 } : { x: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { x: "-100%" }}
+              transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="relative z-10 w-60 overscroll-contain border-r border-border bg-surface"
+            >
+              <div className="flex h-14 items-center justify-between border-b border-border px-4">
+                <Link href="/dashboard" translate="no" className="text-base font-bold text-text-primary">
+                  TraceChain
+                </Link>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close navigation"
+                  autoFocus
+                  className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]"
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+              <nav aria-label="Mobile navigation" className="space-y-1 px-2 py-3">
+                {MOBILE_NAV.map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "flex items-center gap-3 rounded-sm px-3 py-2 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#896ABD]",
+                        active
+                          ? "bg-surface-3 text-text-primary"
+                          : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
+                      )}
+                    >
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
