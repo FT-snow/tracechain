@@ -105,6 +105,29 @@ export default function TerminalPage() {
     push(`${d.transfers.length} transfers · source ${d.source}`);
   };
 
+  const runStatus = async () => {
+    push("engine status — probing …", true);
+    const t0 = Date.now();
+    const res = await fetch("/api/trace", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ address: "0x28C6c06298d514Db089934071355E5743bf21d60" }),
+    });
+    const d = await res.json();
+    if (!res.ok) {
+      push(`trace engine: FAIL (${d.error || res.status})`);
+      return;
+    }
+    push(`trace engine: OK   source: ${d.source}   latency: ${Date.now() - t0}ms   probe: ${d.stoppedOn}`);
+    const rn = await fetch("/api/nft", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" }),
+    });
+    push(`nft engine: ${rn.ok ? "OK" : "FAIL"}   source: blockscout`);
+    push(`session: signed in · api key: ${process.env.NEXT_PUBLIC_TRACECHAIN_API_KEY ? "present" : "absent"}`);
+  };
+
   const runReport = async (addr: string) => {
     push(`report ${addr} — tracing then writing …`, true);
     const res = await fetch("/api/trace", {
@@ -154,6 +177,7 @@ export default function TerminalPage() {
       if (base === "trace" && rest[0]) await runTrace(rest[0]);
       else if (base === "nft" && rest[0]) await runNft(rest[0]);
       else if (base === "report" && rest[0]) await runReport(rest[0]);
+      else if (base === "status") await runStatus();
       else push("unknown command — type help", true);
     } catch {
       push("error: request failed");
