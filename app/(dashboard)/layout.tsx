@@ -42,36 +42,56 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
   const reduceMotion = useReducedMotion();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // hover-open state — separate from the user's pinned choice so a click-pin
+  // still means "stay expanded" until intentionally collapsed again
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const hoverOpenTimer = useRef<number | null>(null);
+
+  const expanded = !collapsed || hoverOpen;
 
   const anim = reduceMotion ? {} : {
     initial: "hidden",
     animate: "visible",
   } as const;
 
-  // hover-open rail: no click needed — pointer enters the collapsed bar,
-  // it expands; leaving collapses it back after a short delay
-  const hoverOpenTimer = useRef<number | null>(null);
-
-  const expandOnHover = useCallback(() => {
+  // hover choreography: quick expand (180ms), unhurried re-collapse (650ms) so a
+  // diagonal mouse path toward content never slams the rail shut
+  const openOnHover = useCallback(() => {
     if (!window.matchMedia("(min-width: 768px)").matches) return;
     if (hoverOpenTimer.current) {
       window.clearTimeout(hoverOpenTimer.current);
       hoverOpenTimer.current = null;
     }
     if (collapsed) {
-      hoverOpenTimer.current = window.setTimeout(() => setCollapsed(false), 220);
+      hoverOpenTimer.current = window.setTimeout(() => {
+        setHoverOpen(true);
+        hoverOpenTimer.current = null;
+      }, reduceMotion ? 0 : 180);
     }
-  }, [collapsed]);
+  }, [collapsed, reduceMotion]);
 
-  const collapseOnLeave = useCallback(() => {
+  const closeOnLeave = useCallback(() => {
     if (hoverOpenTimer.current) {
       window.clearTimeout(hoverOpenTimer.current);
       hoverOpenTimer.current = null;
     }
+    setHoverOpen(false);
     if (!collapsed) {
-      hoverOpenTimer.current = window.setTimeout(() => setCollapsed(true), 450);
+      hoverOpenTimer.current = window.setTimeout(() => {
+        setCollapsed(true);
+        hoverOpenTimer.current = null;
+      }, reduceMotion ? 0 : 640);
     }
-  }, [collapsed]);
+  }, [collapsed, reduceMotion]);
+
+  const togglePin = useCallback(() => {
+    if (hoverOpenTimer.current) {
+      window.clearTimeout(hoverOpenTimer.current);
+      hoverOpenTimer.current = null;
+    }
+    setHoverOpen(false);
+    setCollapsed((c) => !c);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/login");
@@ -93,41 +113,68 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
       <motion.aside
         {...anim}
         variants={sidebarIn}
-        onMouseEnter={expandOnHover}
-        onMouseLeave={collapseOnLeave}
+        onMouseEnter={openOnHover}
+        onMouseLeave={closeOnLeave}
         className={cn(
-          "hidden flex-col border-r border-border bg-surface transition-all duration-300 md:flex",
-          collapsed ? "w-16" : "w-60"
+          "hidden shrink-0 flex-col overflow-hidden border-r border-border bg-surface md:flex",
+          reduceMotion ? "" : "transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          expanded ? "w-60" : "w-16"
         )}
       >
-        <div className="flex h-14 items-center justify-between border-b border-border px-4">
-          {!collapsed && (
-            <Link href="/dashboard" className="text-sm font-bold text-text-primary">
-              TraceChain
-            </Link>
-          )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex h-8 w-8 items-center justify-center rounded text-text-muted hover:text-text-primary"
+        <div className="flex h-14 items-center justify-between overflow-hidden border-b border-border px-4">
+          <Link
+            href="/dashboard"
+            aria-hidden={!expanded}
+            tabIndex={expanded ? 0 : -1}
+            className={cn(
+              "whitespace-nowrap text-sm font-bold text-text-primary transition-opacity duration-300",
+              reduceMotion ? "" : "transition-[opacity,transform]",
+              expanded ? "opacity-100 delay-150" : "w-0 -translate-x-2 opacity-0"
+            )}
           >
-            <Menu className="h-4 w-4" />
+            TraceChain
+          </Link>
+          <button
+            onClick={togglePin}
+            aria-label={expanded ? "Collapse navigation" : "Expand navigation (or hover to open)"}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-text-muted transition-colors hover:text-text-primary"
+          >
+            {expanded ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
-        <nav className="flex-1 space-y-1 px-2 py-3">
+        <nav className="flex-1 space-y-1 overflow-hidden px-2 py-3">
           {nav.map((item) => {
             const active = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                title={item.label}
                 className={cn(
-                  "flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors",
+                  "group relative flex h-9 items-center gap-3 whitespace-nowrap rounded-sm px-3 text-sm transition-colors",
                   active
                     ? "bg-surface-3 text-text-primary"
                     : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
                 )}
               >
-                {!collapsed && <span>{item.label}</span>}
+                <span
+                  className={cn(
+                    "absolute left-0 h-4 w-0.5 rounded-full transition-opacity duration-200",
+                    active ? "bg-text-primary opacity-100" : "opacity-0 group-hover:opacity-40"
+                  )}
+                />
+                <span className="mono flex w-4 shrink-0 justify-center text-[11px] text-text-muted">
+                  {item.label.slice(0, 2).toUpperCase()}
+                </span>
+                <span
+                  className={cn(
+                    "truncate transition-all duration-300",
+                    reduceMotion ? "" : "ease-[cubic-bezier(0.22,1,0.36,1)]",
+                    expanded ? "opacity-100" : "w-0 -translate-x-1 opacity-0"
+                  )}
+                >
+                  {item.label}
+                </span>
               </Link>
             );
           })}
