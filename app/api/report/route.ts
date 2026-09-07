@@ -90,8 +90,6 @@ export async function POST(req: Request) {
         velocity: raw?.riskBreakdown?.velocity ?? 0,
         exchangeConfidence: raw?.riskBreakdown?.exchangeConfidence ?? 0,
       },
-      bridgeDetected: Boolean(raw?.bridgeDetected),
-      startedAt: raw?.startedAt ?? Date.now(),
     };
 
     const timeline = (input.hops ?? [])
